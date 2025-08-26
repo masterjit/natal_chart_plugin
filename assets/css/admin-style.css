@@ -1,0 +1,488 @@
+/**
+ * Admin Styles for Natal Chart Plugin
+ * 
+ * Professional styling for the WordPress admin interface
+ */
+
+/* Admin Container Layout */
+.natal-chart-admin-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.natal-chart-admin-main {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e8ed;
+}
+
+.natal-chart-admin-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Admin Boxes */
+.natal-chart-admin-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e8ed;
+}
+
+.natal-chart-admin-box h3 {
+    margin: 0 0 15px 0;
+    color: #2d3748;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.natal-chart-admin-box p {
+    margin: 0 0 10px 0;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+.natal-chart-admin-box p:last-child {
+    margin-bottom: 0;
+}
+
+.natal-chart-admin-box strong {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Settings Form */
+.natal-chart-admin-main form {
+    margin: 0;
+}
+
+.natal-chart-admin-main .form-table {
+    margin: 0;
+}
+
+.natal-chart-admin-main .form-table th {
+    padding: 20px 10px 20px 0;
+    width: 200px;
+    vertical-align: top;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.natal-chart-admin-main .form-table td {
+    padding: 20px 10px;
+    vertical-align: top;
+}
+
+.natal-chart-admin-main .form-table input[type="text"],
+.natal-chart-admin-main .form-table input[type="password"],
+.natal-chart-admin-main .form-table input[type="url"],
+.natal-chart-admin-main .form-table input[type="number"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.natal-chart-admin-main .form-table input[type="text"]:focus,
+.natal-chart-admin-main .form-table input[type="password"]:focus,
+.natal-chart-admin-main .form-table input[type="url"]:focus,
+.natal-chart-admin-main .form-table input[type="number"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.natal-chart-admin-main .form-table input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+.natal-chart-admin-main .form-table label {
+    color: #4a5568;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.natal-chart-admin-main .form-table .description {
+    margin-top: 8px;
+    color: #718096;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Buttons */
+.natal-chart-admin-main .button {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.natal-chart-admin-main .button-primary {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.natal-chart-admin-main .button-primary:hover {
+    background: #5a67d8;
+    border-color: #5a67d8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.natal-chart-admin-main .button-secondary {
+    background: #e2e8f0;
+    border-color: #e2e8f0;
+    color: #4a5568;
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.natal-chart-admin-main .button-secondary:hover {
+    background: #cbd5e0;
+    border-color: #cbd5e0;
+    color: #2d3748;
+}
+
+/* API Status */
+.natal-chart-admin-box .api-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.natal-chart-admin-box .api-status.configured {
+    background: #f0fff4;
+    color: #22543d;
+    border: 1px solid #9ae6b4;
+}
+
+.natal-chart-admin-box .api-status.not-configured {
+    background: #fed7d7;
+    color: #742a2a;
+    border: 1px solid #feb2b2;
+}
+
+/* Test API Button */
+#test-api-connection {
+    width: 100%;
+    margin-top: 10px;
+    background: #48bb78;
+    border-color: #48bb78;
+    color: white;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+#test-api-connection:hover {
+    background: #38a169;
+    border-color: #38a169;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+/* API Test Results */
+#api-test-result {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+}
+
+#api-test-result.success {
+    background: #f0fff4;
+    color: #22543d;
+    border: 1px solid #9ae6b4;
+}
+
+#api-test-result.error {
+    background: #fed7d7;
+    color: #742a2a;
+    border: 1px solid #feb2b2;
+}
+
+/* Shortcode Usage */
+.natal-chart-admin-box code {
+    background: #f7fafc;
+    color: #e53e3e;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Settings Sections */
+.natal-chart-admin-main .form-table .form-table-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.natal-chart-admin-main .form-table .form-table-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.natal-chart-admin-main .form-table .form-table-section h3 {
+    margin: 0 0 15px 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Field Groups */
+.natal-chart-admin-main .field-group {
+    margin-bottom: 20px;
+}
+
+.natal-chart-admin-main .field-group:last-child {
+    margin-bottom: 0;
+}
+
+.natal-chart-admin-main .field-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.natal-chart-admin-main .field-group input,
+.natal-chart-admin-main .field-group select,
+.natal-chart-admin-main .field-group textarea {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .natal-chart-admin-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .natal-chart-admin-sidebar {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .natal-chart-admin-main,
+    .natal-chart-admin-box {
+        padding: 15px;
+    }
+    
+    .natal-chart-admin-main .form-table th,
+    .natal-chart-admin-main .form-table td {
+        display: block;
+        width: 100%;
+        padding: 10px 0;
+    }
+    
+    .natal-chart-admin-main .form-table th {
+        border-bottom: none;
+        padding-bottom: 5px;
+    }
+    
+    .natal-chart-admin-main .form-table td {
+        padding-top: 5px;
+        padding-bottom: 15px;
+    }
+    
+    .natal-chart-admin-main .form-table input[type="text"],
+    .natal-chart-admin-main .form-table input[type="password"],
+    .natal-chart-admin-main .form-table input[type="url"],
+    .natal-chart-admin-main .form-table input[type="number"] {
+        max-width: 100%;
+    }
+}
+
+/* WordPress Admin Integration */
+.natal-chart-admin-container .wrap h1 {
+    color: #1d2327;
+    font-size: 23px;
+    font-weight: 400;
+    margin: 0 0 1rem 0;
+    padding: 9px 0 4px 0;
+    line-height: 1.3;
+}
+
+.natal-chart-admin-container .wrap h2 {
+    color: #1d2327;
+    font-size: 1.3em;
+    margin: 0 0 0.8em 0;
+    font-weight: 600;
+}
+
+/* Settings API Integration */
+.natal-chart-admin-main .form-table .form-table-section .form-table-section-title {
+    background: #f9f9f9;
+    padding: 15px 20px;
+    margin: 0 -25px 20px -25px;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.natal-chart-admin-main .form-table .form-table-section .form-table-section-title h3 {
+    margin: 0;
+    color: #1d2327;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Enhanced Form Elements */
+.natal-chart-admin-main .form-table input[type="text"].large-text,
+.natal-chart-admin-main .form-table input[type="password"].large-text,
+.natal-chart-admin-main .form-table input[type="url"].large-text {
+    width: 99%;
+    max-width: none;
+}
+
+.natal-chart-admin-main .form-table input[type="text"].regular-text,
+.natal-chart-admin-main .form-table input[type="password"].regular-text,
+.natal-chart-admin-main .form-table input[type="url"].regular-text {
+    width: 25em;
+    max-width: 100%;
+}
+
+.natal-chart-admin-main .form-table input[type="text"].small-text,
+.natal-chart-admin-main .form-table input[type="number"].small-text {
+    width: 5em;
+}
+
+/* Checkbox Styling */
+.natal-chart-admin-main .form-table input[type="checkbox"] + label {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+/* Description Styling */
+.natal-chart-admin-main .form-table .description {
+    font-style: italic;
+    color: #666;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Error and Success Messages */
+.natal-chart-admin-main .notice {
+    margin: 15px 0;
+    padding: 12px;
+    border-radius: 4px;
+    border-left: 4px solid;
+}
+
+.natal-chart-admin-main .notice-success {
+    background: #f0fff4;
+    border-left-color: #48bb78;
+    color: #22543d;
+}
+
+.natal-chart-admin-main .notice-error {
+    background: #fed7d7;
+    border-left-color: #e53e3e;
+    color: #742a2a;
+}
+
+.natal-chart-admin-main .notice-warning {
+    background: #fef5e7;
+    border-left-color: #ed8936;
+    color: #744210;
+}
+
+.natal-chart-admin-main .notice-info {
+    background: #ebf8ff;
+    border-left-color: #3182ce;
+    color: #2a4365;
+}
+
+/* Loading States */
+.natal-chart-admin-main .loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.natal-chart-admin-main .loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Accessibility */
+.natal-chart-admin-main .form-table input:focus,
+.natal-chart-admin-main .form-table select:focus,
+.natal-chart-admin-main .form-table textarea:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.natal-chart-admin-main .button:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .natal-chart-admin-main .form-table input,
+    .natal-chart-admin-main .form-table select,
+    .natal-chart-admin-main .form-table textarea {
+        border-width: 2px;
+    }
+    
+    .natal-chart-admin-box {
+        border-width: 2px;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .natal-chart-admin-main .form-table input,
+    .natal-chart-admin-main .form-table select,
+    .natal-chart-admin-main .form-table textarea,
+    .natal-chart-admin-main .button {
+        transition: none;
+    }
+    
+    .natal-chart-admin-main .loading::after {
+        animation: none;
+    }
+}
