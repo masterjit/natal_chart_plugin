@@ -18,9 +18,19 @@ class NatalChartLocationAutocomplete {
         this.searchInput = document.getElementById('natal_chart_location_search');
         this.resultsContainer = document.getElementById('natal_chart_location_results');
         
-        if (this.searchInput) {
-            this.bindEvents();
+        // Validate that both required elements exist
+        if (!this.searchInput) {
+            console.error('Natal Chart: Location search input not found');
+            return;
         }
+        
+        if (!this.resultsContainer) {
+            console.error('Natal Chart: Location results container not found');
+            return;
+        }
+        
+        console.log('Natal Chart: Location autocomplete initialized successfully');
+        this.bindEvents();
     }
 
     bindEvents() {
@@ -65,15 +75,21 @@ class NatalChartLocationAutocomplete {
     }
 
     handleSearchBlur() {
+        // Safety check
+        if (!this.resultsContainer) return;
+        
         // Delay hiding to allow for clicks on results
         setTimeout(() => {
-            if (!this.resultsContainer.matches(':hover')) {
+            if (this.resultsContainer && !this.resultsContainer.matches(':hover')) {
                 this.hideResultsContainer();
             }
         }, 150);
     }
 
     handleSearchKeydown(e) {
+        // Safety check
+        if (!this.resultsContainer) return;
+        
         const results = this.resultsContainer.querySelectorAll('.natal-chart-location-result');
         const currentIndex = Array.from(results).findIndex(result => result.classList.contains('selected'));
         
@@ -100,6 +116,9 @@ class NatalChartLocationAutocomplete {
     }
 
     handleClickOutside(e) {
+        // Safety check
+        if (!this.resultsContainer) return;
+        
         if (!this.searchInput.contains(e.target) && !this.resultsContainer.contains(e.target)) {
             this.hideResultsContainer();
         }
