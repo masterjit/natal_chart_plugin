@@ -52,7 +52,9 @@ class NatalChartLocationAutocomplete {
         const requiredFields = [
             'natal_chart_name',
             'natal_chart_birth_date',
-            'natal_chart_birth_time'
+            'natal_chart_birth_hour',
+            'natal_chart_birth_minute',
+            'natal_chart_birth_ampm'
         ];
         
         // Add input event listeners to all required fields
@@ -61,21 +63,27 @@ class NatalChartLocationAutocomplete {
             if (field) {
                 field.addEventListener('input', () => {
                     this.validateField(field);
-                    this.updateSubmitButton();
+                    // Let the main form handler manage the submit button
+                    if (window.natalChartForm && typeof window.natalChartForm.updateSubmitButton === 'function') {
+                        window.natalChartForm.updateSubmitButton();
+                    }
                 });
                 field.addEventListener('change', () => {
                     this.validateField(field);
-                    this.updateSubmitButton();
+                    if (window.natalChartForm && typeof window.natalChartForm.updateSubmitButton === 'function') {
+                        window.natalChartForm.updateSubmitButton();
+                    }
                 });
                 field.addEventListener('blur', () => {
                     this.validateField(field);
-                    this.updateSubmitButton();
+                    if (window.natalChartForm && typeof window.natalChartForm.updateSubmitButton === 'function') {
+                        window.natalChartForm.updateSubmitButton();
+                    }
                 });
             }
         });
         
-        // Initial button state and field validation
-        this.updateSubmitButton();
+        // Initial field validation
         this.validateAllFields();
     }
 
@@ -100,7 +108,9 @@ class NatalChartLocationAutocomplete {
         const requiredFields = [
             'natal_chart_name',
             'natal_chart_birth_date',
-            'natal_chart_birth_time'
+            'natal_chart_birth_hour',
+            'natal_chart_birth_minute',
+            'natal_chart_birth_ampm'
         ];
         
         requiredFields.forEach(fieldId => {
@@ -358,6 +368,16 @@ class NatalChartLocationAutocomplete {
         const locationData = JSON.parse(resultElement.dataset.location);
         this.selectedLocation = locationData;
         
+        console.log('Location selected:', locationData.label);
+        console.log('Checking if main form handler is available...');
+        console.log('window.natalChartForm exists:', !!window.natalChartForm);
+        
+        if (window.natalChartForm) {
+            console.log('Main form handler found, checking methods...');
+            console.log('updateSubmitButton method exists:', typeof window.natalChartForm.updateSubmitButton === 'function');
+            console.log('isFormValid method exists:', typeof window.natalChartForm.isFormValid === 'function');
+        }
+        
         // Populate form fields
         this.populateFormFields(locationData);
         
@@ -366,16 +386,31 @@ class NatalChartLocationAutocomplete {
         this.searchInput.classList.add('natal-chart-location-selected');
         this.hideResultsContainer();
         
-        // Trigger form validation update
-        this.updateSubmitButton();
-        this.clearLocationError();
+        // Use the simple enableSubmitButton function
+        if (typeof window.enableSubmitButton === 'function') {
+            console.log('Calling simple enableSubmitButton function...');
+            window.enableSubmitButton();
+        } else {
+            console.log('Simple enableSubmitButton function not available, trying main form handler...');
+            // Fallback to main form handler
+            if (window.natalChartForm && typeof window.natalChartForm.updateSubmitButton === 'function') {
+                console.log('Calling main form handler updateSubmitButton...');
+                try {
+                    window.natalChartForm.updateSubmitButton();
+                    console.log('✅ Successfully called updateSubmitButton');
+                } catch (error) {
+                    console.error('❌ Error calling updateSubmitButton:', error);
+                }
+            } else {
+                console.warn('❌ No submit button update method available');
+            }
+        }
         
         // Trigger change event for form validation
         this.searchInput.dispatchEvent(new Event('change', { bubbles: true }));
         
-        // Log location selection
-        console.log('Location selected:', locationData.label);
-        console.log('Form validation status:', this.isFormValid());
+        // Clear any location errors
+        this.clearLocationError();
     }
 
     populateFormFields(location) {
@@ -392,6 +427,8 @@ class NatalChartLocationAutocomplete {
         this.selectedLocation = null;
         this.searchInput.classList.remove('natal-chart-location-selected');
         
+        console.log('Location selection cleared');
+        
         // Clear all location-related fields
         document.getElementById('natal_chart_location').value = '';
         document.getElementById('natal_chart_latitude').value = '';
@@ -401,72 +438,35 @@ class NatalChartLocationAutocomplete {
         document.getElementById('natal_chart_offset_round').value = '';
         
         this.hideResultsContainer();
-        this.updateSubmitButton();
         
-        // Log selection cleared
-        console.log('Location selection cleared');
-        console.log('Form validation status:', this.isFormValid());
+        // Use the simple enableSubmitButton function
+        if (typeof window.enableSubmitButton === 'function') {
+            console.log('Calling simple enableSubmitButton function after clearing selection...');
+            window.enableSubmitButton();
+        } else {
+            console.log('Simple enableSubmitButton function not available, trying main form handler...');
+            // Fallback to main form handler
+            if (window.natalChartForm && typeof window.natalChartForm.updateSubmitButton === 'function') {
+                console.log('Calling main form handler updateSubmitButton after clearing selection...');
+                try {
+                    window.natalChartForm.updateSubmitButton();
+                    console.log('✅ Successfully called updateSubmitButton');
+                } catch (error) {
+                    console.error('❌ Error calling updateSubmitButton:', error);
+                }
+            } else {
+                console.warn('❌ No submit button update method available');
+            }
+        }
     }
 
     updateSubmitButton() {
-        const submitButton = document.getElementById('natal_chart_submit');
-        if (submitButton) {
-            const isFormValid = this.isFormValid();
-            
-            // Update button state
-            submitButton.disabled = !isFormValid;
-            
-            // Add visual feedback
-            if (isFormValid) {
-                submitButton.classList.add('natal-chart-submit-ready');
-                submitButton.classList.remove('natal-chart-submit-disabled');
-                console.log('Submit button: ENABLED - All fields are filled');
-            } else {
-                submitButton.classList.remove('natal-chart-submit-ready');
-                submitButton.classList.add('natal-chart-submit-disabled');
-                console.log('Submit button: DISABLED - Some fields are missing');
-            }
-            
-            // Update button text to show current state
-            const submitText = submitButton.querySelector('.natal-chart-submit-text');
-            if (submitText) {
-                if (isFormValid) {
-                    submitText.textContent = 'Generate Report';
-                } else {
-                    submitText.textContent = 'Generate Report';
-                }
-            }
-        }
+        // This function is now handled by the main form handler
     }
 
     isFormValid() {
-        const requiredFields = [
-            'natal_chart_name',
-            'natal_chart_birth_date',
-            'natal_chart_birth_time'
-        ];
-        
-        // Check if location is selected
-        if (!this.selectedLocation) {
-            console.log('Form validation: Location not selected');
-            return false;
-        }
-        
-        // Check other required fields
-        const allFieldsValid = requiredFields.every(fieldId => {
-            const field = document.getElementById(fieldId);
-            const isValid = field && field.value.trim() !== '';
-            if (!isValid) {
-                console.log(`Form validation: Field ${fieldId} is empty`);
-            }
-            return isValid;
-        });
-        
-        if (allFieldsValid) {
-            console.log('Form validation: All fields are valid - submit button enabled');
-        }
-        
-        return allFieldsValid;
+        // This function is now handled by the main form handler
+        return true; // Placeholder, as this logic is moved to natal-chart-form.js
     }
 
     clearLocationError() {
@@ -504,7 +504,116 @@ class NatalChartLocationAutocomplete {
     }
 }
 
+// Global function to manually initialize location autocomplete
+window.initializeLocationAutocompleteManually = function() {
+    console.log('Manual location autocomplete initialization requested...');
+    return initializeLocationAutocomplete();
+};
+
+// Global function to check if location autocomplete is ready
+window.isLocationAutocompleteReady = function() {
+    return window.natalChartLocationAutocomplete && 
+           window.natalChartLocationAutocomplete.searchInput;
+};
+
+// Global function to get location autocomplete status
+window.getLocationAutocompleteStatus = function() {
+    return {
+        searchInputExists: !!document.getElementById('natal_chart_location_search'),
+        resultsContainerExists: !!document.getElementById('natal_chart-location-results'),
+        autocompleteHandlerExists: !!window.natalChartLocationAutocomplete,
+        autocompleteInitialized: !!(window.natalChartLocationAutocomplete && 
+                                   window.natalChartLocationAutocomplete.searchInput)
+    };
+};
+
+// Robust initialization that waits for the form to appear
+function initializeLocationAutocomplete() {
+    console.log('Checking for location autocomplete elements...');
+    
+    const searchInput = document.getElementById('natal_chart_location_search');
+    const resultsContainer = document.getElementById('natal-chart-location-results');
+    
+    if (searchInput && resultsContainer) {
+        console.log('Location autocomplete elements found! Initializing...');
+        
+        // Check if already initialized
+        if (window.natalChartLocationAutocomplete) {
+            console.log('Location autocomplete already exists');
+            return true;
+        }
+        
+        try {
+            window.natalChartLocationAutocomplete = new NatalChartLocationAutocomplete();
+            console.log('Location autocomplete initialized successfully');
+            return true;
+        } catch (error) {
+            console.error('Error initializing location autocomplete:', error);
+            return false;
+        }
+    } else {
+        console.log('Location autocomplete elements not found yet, will retry...');
+        return false;
+    }
+}
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new NatalChartLocationAutocomplete();
+    console.log('DOM Content Loaded - Starting location autocomplete detection...');
+    
+    // Try to initialize immediately
+    if (!initializeLocationAutocomplete()) {
+        // If elements not found, start polling
+        console.log('Starting location autocomplete detection polling...');
+        const autocompleteCheckInterval = setInterval(() => {
+            if (initializeLocationAutocomplete()) {
+                clearInterval(autocompleteCheckInterval);
+                console.log('Location autocomplete detected and initialized, stopping polling');
+            }
+        }, 500); // Check every 500ms
+        
+        // Stop polling after 10 seconds
+        setTimeout(() => {
+            clearInterval(autocompleteCheckInterval);
+            console.log('Location autocomplete detection timeout - elements may not be present on this page');
+        }, 10000);
+    }
 });
+
+// Also try to initialize if DOM is already loaded
+if (document.readyState === 'loading') {
+    console.log('DOM still loading, waiting for DOMContentLoaded...');
+} else {
+    console.log('DOM already loaded, checking for location autocomplete elements immediately...');
+    initializeLocationAutocomplete();
+}
+
+// Listen for dynamic content changes
+if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        // Check if the added node contains our elements
+                        if (node.id === 'natal_chart_location_search' || 
+                            node.querySelector('#natal_chart_location_search') ||
+                            node.id === 'natal_chart-location-results' ||
+                            node.querySelector('#natal_chart-location-results')) {
+                            console.log('Location autocomplete elements detected via MutationObserver');
+                            setTimeout(initializeLocationAutocomplete, 100);
+                        }
+                    }
+                });
+            }
+        });
+    });
+    
+    // Start observing
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    console.log('MutationObserver started for dynamic location autocomplete detection');
+}

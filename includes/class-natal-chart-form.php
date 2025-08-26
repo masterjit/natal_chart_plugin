@@ -42,7 +42,7 @@ class Natal_Chart_Form {
         ob_start();
         ?>
         <div class="natal-chart-form-container">
-            <form id="natal-chart-form" class="natal-chart-form" method="post">
+            <form id="natal_chart_form" class="natal-chart-form" action="javascript:void(0)">
                 <?php wp_nonce_field('natal_chart_nonce', 'natal_chart_nonce'); ?>
                 
                 <!-- Birth Location Section (First) -->
@@ -127,17 +127,38 @@ class Natal_Chart_Form {
                     <label for="natal_chart_birth_time" class="natal-chart-form-label">
                         <?php _e('Birth Time', 'natal-chart-plugin'); ?> <span class="required">*</span>
                     </label>
-                    <input type="time" 
-                           id="natal_chart_birth_time" 
-                           name="natal_chart_birth_time" 
-                           class="natal-chart-form-input" 
-                           required />
+                    <div class="natal-chart-time-input-group">
+                        <input type="number" 
+                               id="natal_chart_birth_hour" 
+                               name="natal_chart_birth_hour" 
+                               class="natal-chart-form-input natal-chart-time-input" 
+                               min="1" 
+                               max="12" 
+                               placeholder="12" 
+                               required />
+                        <span class="natal-chart-time-separator">:</span>
+                        <input type="number" 
+                               id="natal_chart_birth_minute" 
+                               name="natal_chart_birth_minute" 
+                               class="natal-chart-form-input natal-chart-time-input" 
+                               min="0" 
+                               max="59" 
+                               placeholder="00" 
+                               required />
+                        <select id="natal_chart_birth_ampm" 
+                                name="natal_chart_birth_ampm" 
+                                class="natal-chart-form-input natal-chart-ampm-select">
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Hidden fields for location data -->
                 <input type="hidden" id="natal_chart_location" name="natal_chart_location" />
                 <input type="hidden" id="natal_chart_timezone" name="natal_chart_timezone" />
                 <input type="hidden" id="natal_chart_offset" name="natal_chart_offset" />
+                <input type="hidden" id="natal_chart_house_system" name="natal_chart_house_system" value="p" />
 
                 <div class="natal-chart-form-group">
                     <button type="submit" id="natal_chart_submit" class="natal-chart-form-submit" disabled>
@@ -147,6 +168,21 @@ class Natal_Chart_Form {
                             <?php _e('Generating Report...', 'natal-chart-plugin'); ?>
                         </span>
                     </button>
+                    
+                    <!-- Test Button for AJAX Debugging -->
+                    <button type="button" id="natal_chart_test_ajax" class="natal-chart-form-test" style="margin-left: 10px; background: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        Test AJAX
+                    </button>
+                </div>
+                
+                <!-- Debug Test Button -->
+                <div class="natal-chart-form-group" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; border: 1px dashed #dee2e6;">
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">
+                        <strong>Debug:</strong> Click this button to test form validation
+                    </p>
+                    <button type="button" onclick="testFormValidation()" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Test Form Validation
+                    </button>
                 </div>
             </form>
 
@@ -155,6 +191,44 @@ class Natal_Chart_Form {
             <div id="natal-chart-results" class="natal-chart-results" style="display: none;"></div>
             <?php endif; ?>
         </div>
+        
+        <script>
+        // Ensure form is initialized after rendering
+        (function() {
+            console.log('Form shortcode rendered, checking initialization...');
+            
+            // Wait a bit for DOM to settle
+            setTimeout(function() {
+                // Initialize form handler
+                if (typeof window.initializeNatalChartFormManually === 'function') {
+                    console.log('Calling manual form initialization...');
+                    window.initializeNatalChartFormManually();
+                } else {
+                    console.log('Manual form initialization function not available yet, will retry...');
+                    // Retry after a longer delay
+                    setTimeout(function() {
+                        if (typeof window.initializeNatalChartFormManually === 'function') {
+                            window.initializeNatalChartFormManually();
+                        }
+                    }, 1000);
+                }
+                
+                // Initialize location autocomplete
+                if (typeof window.initializeLocationAutocompleteManually === 'function') {
+                    console.log('Calling manual location autocomplete initialization...');
+                    window.initializeLocationAutocompleteManually();
+                } else {
+                    console.log('Manual location autocomplete initialization function not available yet, will retry...');
+                    // Retry after a longer delay
+                    setTimeout(function() {
+                        if (typeof window.initializeLocationAutocompleteManually === 'function') {
+                            window.initializeLocationAutocompleteManually();
+                        }
+                    }, 1000);
+                }
+            }, 100);
+        })();
+        </script>
         <?php
         return ob_get_clean();
     }
@@ -188,39 +262,50 @@ class Natal_Chart_Form {
             }
         }
         
-        // Validate birth time
+        // Validate birth time (already converted to 24-hour format in JavaScript)
         if (empty($data['natal_chart_birth_time'])) {
             $errors['natal_chart_birth_time'] = __('Birth time is required.', 'natal-chart-plugin');
         } else {
             $birth_time = sanitize_text_field($data['natal_chart_birth_time']);
-            if (!$this->is_valid_time($birth_time)) {
+            if (!$this->is_valid_time_24($birth_time)) {
                 $errors['natal_chart_birth_time'] = __('Please enter a valid birth time.', 'natal-chart-plugin');
             } else {
                 $validated['birth_time'] = $birth_time;
             }
         }
         
-        // Validate location data
+        // Validate timezone (offset_round value)
+        if (!isset($data['natal_chart_timezone']) || $data['natal_chart_timezone'] === '') {
+            $errors['natal_chart_timezone'] = __('Timezone is required.', 'natal-chart-plugin');
+        } else {
+            $validated['timezone'] = floatval($data['natal_chart_timezone']);
+        }
+        
+        // Validate latitude
+        if (!isset($data['natal_chart_latitude']) || $data['natal_chart_latitude'] === '') {
+            $errors['natal_chart_latitude'] = __('Latitude is required.', 'natal-chart-plugin');
+        } else {
+            $validated['latitude'] = floatval($data['natal_chart_latitude']);
+        }
+        
+        // Validate longitude
+        if (!isset($data['natal_chart_longitude']) || $data['natal_chart_longitude'] === '') {
+            $errors['natal_chart_longitude'] = __('Longitude is required.', 'natal-chart-plugin');
+        } else {
+            $validated['longitude'] = floatval($data['natal_chart_longitude']);
+        }
+        
+        // Validate location
         if (empty($data['natal_chart_location'])) {
-            $errors['natal_chart_location'] = __('Please select a location from the search results.', 'natal-chart-plugin');
+            $errors['natal_chart_location'] = __('Location is required.', 'natal-chart-plugin');
         } else {
             $validated['location'] = sanitize_text_field($data['natal_chart_location']);
         }
         
-        if (empty($data['natal_chart_latitude']) || empty($data['natal_chart_longitude'])) {
-            $errors['natal_chart_location'] = __('Location coordinates are required. Please select a location from the search results.', 'natal-chart-plugin');
-        } else {
-            $validated['latitude'] = floatval($data['natal_chart_latitude']);
-            $validated['longitude'] = floatval($data['natal_chart_longitude']);
-        }
+        // Validate house system (default to 'p' if not provided)
+        $validated['house_system'] = sanitize_text_field($data['natal_chart_house_system'] ?? 'p');
         
-        if (empty($data['natal_chart_timezone'])) {
-            $errors['natal_chart_timezone'] = __('Timezone is required. Please select a location from the search results.', 'natal-chart-plugin');
-        } else {
-            $validated['timezone'] = sanitize_text_field($data['natal_chart_timezone']);
-        }
-        
-        // Return errors if any
+        // If there are errors, return them
         if (!empty($errors)) {
             return new WP_Error('validation_failed', __('Please correct the errors below.', 'natal-chart-plugin'), $errors);
         }
@@ -246,6 +331,17 @@ class Natal_Chart_Form {
      * @return bool True if valid, false otherwise
      */
     private function is_valid_time($time) {
+        $t = DateTime::createFromFormat('H:i', $time);
+        return $t && $t->format('H:i') === $time;
+    }
+
+    /**
+     * Check if time is valid in 24-hour format
+     * 
+     * @param string $time Time string in 24-hour format
+     * @return bool True if valid, false otherwise
+     */
+    private function is_valid_time_24($time) {
         $t = DateTime::createFromFormat('H:i', $time);
         return $t && $t->format('H:i') === $time;
     }
@@ -312,8 +408,20 @@ class Natal_Chart_Form {
                         <span><?php echo esc_html($form_data['location']); ?></span>
                     </div>
                     <div class="natal-chart-info-item">
-                        <strong><?php _e('Timezone:', 'natal-chart-plugin'); ?></strong>
+                        <strong><?php _e('Latitude:', 'natal-chart-plugin'); ?></strong>
+                        <span><?php echo esc_html($form_data['latitude']); ?></span>
+                    </div>
+                    <div class="natal-chart-info-item">
+                        <strong><?php _e('Longitude:', 'natal-chart-plugin'); ?></strong>
+                        <span><?php echo esc_html($form_data['longitude']); ?></span>
+                    </div>
+                    <div class="natal-chart-info-item">
+                        <strong><?php _e('Timezone Offset:', 'natal-chart-plugin'); ?></strong>
                         <span><?php echo esc_html($form_data['timezone']); ?></span>
+                    </div>
+                    <div class="natal-chart-info-item">
+                        <strong><?php _e('House System:', 'natal-chart-plugin'); ?></strong>
+                        <span><?php echo esc_html($form_data['house_system']); ?></span>
                     </div>
                 </div>
             </div>

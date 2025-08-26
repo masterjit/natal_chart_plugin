@@ -74,17 +74,16 @@ class Natal_Chart_Ajax {
             wp_die(__('Security check failed.', 'natal-chart-plugin'));
         }
         
-        // Get form data
+        // Get form data with new field names
         $form_data = array(
             'natal_chart_name' => sanitize_text_field($_POST['natal_chart_name'] ?? ''),
             'natal_chart_birth_date' => sanitize_text_field($_POST['natal_chart_birth_date'] ?? ''),
             'natal_chart_birth_time' => sanitize_text_field($_POST['natal_chart_birth_time'] ?? ''),
-            'natal_chart_location' => sanitize_text_field($_POST['natal_chart_location'] ?? ''),
-            'natal_chart_latitude' => sanitize_text_field($_POST['natal_chart_latitude'] ?? ''),
-            'natal_chart_longitude' => sanitize_text_field($_POST['natal_chart_longitude'] ?? ''),
-            'natal_chart_timezone' => sanitize_text_field($_POST['natal_chart_timezone'] ?? ''),
-            'natal_chart_offset' => sanitize_text_field($_POST['natal_chart_offset'] ?? ''),
-            'natal_chart_offset_round' => sanitize_text_field($_POST['natal_chart_offset_round'] ?? '')
+            'natal_chart_timezone' => floatval($_POST['natal_chart_timezone'] ?? 0),
+            'natal_chart_latitude' => floatval($_POST['natal_chart_latitude'] ?? 0),
+            'natal_chart_longitude' => floatval($_POST['natal_chart_longitude'] ?? 0),
+            'natal_chart_house_system' => sanitize_text_field($_POST['natal_chart_house_system'] ?? 'p'),
+            'natal_chart_location' => sanitize_text_field($_POST['natal_chart_location'] ?? '')
         );
         
         // Initialize form class
@@ -102,10 +101,12 @@ class Natal_Chart_Ajax {
         
         // Store results for later retrieval
         $shortcode = new Natal_Chart_Shortcode();
-        $shortcode->store_results($result['data'], $result['form_data']);
         
-        // Render results HTML
+        // Render results HTML first
         $results_html = $form->render_results($result['data'], $result['form_data']);
+        
+        // Store the rendered HTML results
+        $shortcode->store_results($results_html, $result['form_data']);
         
         wp_send_json_success(array(
             'message' => __('Natal chart generated successfully!', 'natal-chart-plugin'),

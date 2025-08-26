@@ -305,6 +305,91 @@
     color: #333;
 }
 
+/* Results Shortcode Styles */
+.natal-chart-results-shortcode {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.natal-chart-results-shortcode .natal-chart-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e1e8ed;
+}
+
+.natal-chart-results-shortcode .natal-chart-results-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 24px;
+}
+
+.natal-chart-results-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e8ed;
+    justify-content: center;
+}
+
+.natal-chart-results-actions button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.natal-chart-print-results {
+    background: #17a2b8;
+    color: white;
+}
+
+.natal-chart-print-results:hover {
+    background: #138496;
+    transform: translateY(-1px);
+}
+
+.natal-chart-download-results {
+    background: #28a745;
+    color: white;
+}
+
+.natal-chart-download-results:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.natal-chart-new-chart {
+    background: #6f42c1;
+    color: white;
+}
+
+.natal-chart-new-chart:hover {
+    background: #5a32a3;
+    transform: translateY(-1px);
+}
+
+/* No results message */
+.natal-chart-no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+    font-style: italic;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .natal-chart-form-container {
@@ -380,5 +465,94 @@
     .natal-chart-results {
         box-shadow: none;
         border: 1px solid #ccc;
+    }
+}
+
+/* Time Input Styles */
+.natal-chart-time-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.3s ease;
+}
+
+.natal-chart-time-input-group:focus-within {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.natal-chart-time-input {
+    width: 80px !important;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    padding: 8px 4px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.natal-chart-time-input:focus {
+    outline: none;
+    background-color: #e3f2fd;
+}
+
+.natal-chart-time-separator {
+    font-size: 18px;
+    font-weight: 600;
+    color: #666;
+    margin: 0 4px;
+    user-select: none;
+}
+
+.natal-chart-ampm-select {
+    width: 80px !important;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 4px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.natal-chart-ampm-select:focus {
+    outline: none;
+    background-color: #e3f2fd;
+}
+
+/* Time input validation states */
+.natal-chart-time-input-group.valid {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.natal-chart-time-input-group.invalid {
+    border-color: #dc3545;
+    background-color: #fff8f8;
+}
+
+/* Responsive time input */
+@media (max-width: 480px) {
+    .natal-chart-time-input-group {
+        gap: 6px;
+        padding: 6px 8px;
+    }
+    
+    .natal-chart-time-input,
+    .natal-chart-ampm-select {
+        width: 70px !important;
+        font-size: 14px;
+    }
+    
+    .natal-chart-time-separator {
+        font-size: 16px;
     }
 }
