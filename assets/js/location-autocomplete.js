@@ -16,7 +16,7 @@ class NatalChartLocationAutocomplete {
 
     init() {
         this.searchInput = document.getElementById('natal_chart_location_search');
-        this.resultsContainer = document.getElementById('natal_chart_location_results');
+        this.resultsContainer = document.getElementById('natal-chart-location-results');
         
         // Validate that both required elements exist
         if (!this.searchInput) {
@@ -149,6 +149,10 @@ class NatalChartLocationAutocomplete {
         this.showSearchingState();
         
         try {
+            console.log('Searching for locations with query:', query);
+            console.log('AJAX URL:', natal_chart_ajax.ajax_url);
+            console.log('Nonce:', natal_chart_ajax.nonce);
+            
             const response = await fetch(natal_chart_ajax.ajax_url, {
                 method: 'POST',
                 headers: {
@@ -161,12 +165,34 @@ class NatalChartLocationAutocomplete {
                 })
             });
             
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
             const data = await response.json();
+            console.log('Full response data:', data);
+            console.log('Data structure:', {
+                success: data.success,
+                hasData: !!data.data,
+                dataType: typeof data.data,
+                dataKeys: data.data ? Object.keys(data.data) : 'No data object',
+                hasResults: data.data && data.data.results,
+                resultsType: data.data && data.data.results ? typeof data.data.results : 'No results',
+                isResultsArray: data.data && data.data.results ? Array.isArray(data.data.results) : 'No results'
+            });
             
             if (data.success) {
-                this.displayResults(data.data);
+                console.log('Success response, data structure:', data.data);
+                if (data.data && data.data.results) {
+                    console.log('Results found:', data.data.results);
+                    this.displayResults(data.data.results);
+                } else {
+                    console.error('No results data found in response');
+                    this.showError('No location data received from server');
+                }
             } else {
-                this.showError(data.data.message || natal_chart_ajax.strings.error);
+                console.error('API returned error:', data);
+                const errorMessage = data.data && data.data.message ? data.data.message : natal_chart_ajax.strings.error;
+                this.showError(errorMessage);
             }
         } catch (error) {
             console.error('Location search error:', error);
@@ -187,25 +213,48 @@ class NatalChartLocationAutocomplete {
     }
 
     displayResults(locations) {
-        if (!locations || locations.length === 0) {
+        // Add better data validation and debugging
+        console.log('Display results called with:', locations);
+        console.log('Type of locations:', typeof locations);
+        console.log('Is Array?', Array.isArray(locations));
+        
+        // Ensure locations is an array
+        if (!locations) {
+            console.error('Locations data is null or undefined');
             this.showNoResults();
             return;
         }
         
-        const resultsHTML = locations.map(location => `
-            <div class="natal-chart-location-result" data-location='${JSON.stringify(location)}'>
-                <div class="city-name">${this.escapeHtml(location.label)}</div>
-                <div class="city-details">
-                    ${location.country ? location.country : ''}
-                    ${location.timezone ? ` • ${location.timezone}` : ''}
-                    ${location.population ? ` • Pop: ${this.formatNumber(location.population)}` : ''}
-                </div>
-            </div>
-        `).join('');
+        if (!Array.isArray(locations)) {
+            console.error('Locations data is not an array:', locations);
+            this.showError('Invalid data format received from server');
+            return;
+        }
         
-        this.resultsContainer.innerHTML = resultsHTML;
-        this.showResultsContainer();
-        this.bindResultEvents();
+        if (locations.length === 0) {
+            this.showNoResults();
+            return;
+        }
+        
+        try {
+            const resultsHTML = locations.map(location => `
+                <div class="natal-chart-location-result" data-location='${JSON.stringify(location)}'>
+                    <div class="city-name">${this.escapeHtml(location.label || location.name || 'Unknown')}</div>
+                    <div class="city-details">
+                        ${location.country ? location.country : ''}
+                        ${location.timezone ? ` • ${location.timezone}` : ''}
+                        ${location.population ? ` • Pop: ${this.formatNumber(location.population)}` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            this.resultsContainer.innerHTML = resultsHTML;
+            this.showResultsContainer();
+            this.bindResultEvents();
+        } catch (error) {
+            console.error('Error processing location results:', error);
+            this.showError('Error processing location results');
+        }
     }
 
     showNoResults() {
@@ -320,13 +369,13 @@ class NatalChartLocationAutocomplete {
 
     showResultsContainer() {
         if (this.resultsContainer) {
-            this.resultsContainer.style.display = 'block';
+            this.resultsContainer.classList.add('show');
         }
     }
 
     hideResultsContainer() {
         if (this.resultsContainer) {
-            this.resultsContainer.style.display = 'none';
+            this.resultsContainer.classList.remove('show');
         }
     }
 

@@ -50,13 +50,17 @@ class Natal_Chart_Form {
                     <label for="natal_chart_location_search" class="natal-chart-form-label">
                         <?php _e('Birth Location', 'natal-chart-plugin'); ?> <span class="required">*</span>
                     </label>
-                    <input type="text" 
-                           id="natal_chart_location_search" 
-                           name="natal_chart_location_search" 
-                           class="natal-chart-form-input natal-chart-location-search" 
-                           placeholder="<?php esc_attr_e('Start typing to search for a city...', 'natal-chart-plugin'); ?>" 
-                           required />
-                    <div class="natal-chart-location-results" id="natal-chart-location-results"></div>
+                    
+                    <!-- Location Search Container -->
+                    <div class="natal-chart-location-search-container">
+                        <input type="text" 
+                               id="natal_chart_location_search" 
+                               name="natal_chart_location_search" 
+                               class="natal-chart-form-input natal-chart-location-search" 
+                               placeholder="<?php esc_attr_e('Start typing to search for a city...', 'natal-chart-plugin'); ?>" 
+                               required />
+                        <div class="natal-chart-location-results" id="natal-chart-location-results"></div>
+                    </div>
                     
                     <!-- Readonly Location Data Fields -->
                     <div class="natal-chart-location-data">

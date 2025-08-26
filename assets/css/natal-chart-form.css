@@ -126,7 +126,7 @@
 }
 
 /* Location Search Styles */
-.natal-chart-location-search {
+.natal-chart-location-search-container {
     position: relative;
 }
 
@@ -144,8 +144,15 @@
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: none;
+    margin-top: -1px; /* Ensure seamless connection with input border */
 }
 
+/* Ensure the dropdown appears above other elements */
+.natal-chart-location-results.show {
+    display: block;
+}
+
+/* Style for individual location results */
 .natal-chart-location-result {
     padding: 12px 16px;
     cursor: pointer;
@@ -159,17 +166,24 @@
 
 .natal-chart-location-result:last-child {
     border-bottom: none;
+    border-radius: 0 0 6px 6px; /* Match parent border radius */
 }
 
 .natal-chart-location-result .city-name {
     font-weight: 600;
     color: #333;
+    font-size: 14px;
 }
 
 .natal-chart-location-result .city-details {
     font-size: 12px;
     color: #666;
     margin-top: 4px;
+}
+
+.natal-chart-location-result.selected {
+    background-color: #e3f2fd;
+    border-left: 3px solid #2196f3;
 }
 
 .natal-chart-location-selected {
@@ -184,6 +198,8 @@
     background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid #e9ecef;
+    position: relative;
+    z-index: 1; /* Lower than dropdown */
 }
 
 .natal-chart-location-data .natal-chart-form-label {
