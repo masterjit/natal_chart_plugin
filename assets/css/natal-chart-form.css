@@ -77,6 +77,33 @@
     box-shadow: none;
 }
 
+/* Form field validation styles */
+.natal-chart-form-input.valid {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.natal-chart-form-input.valid:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.natal-chart-form-input.invalid {
+    border-color: #dc3545;
+    background-color: #fff8f8;
+}
+
+.natal-chart-form-input.invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* Location field selected state */
+.natal-chart-location-search.natal-chart-location-selected {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
 .natal-chart-form-submit {
     width: 100%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -102,6 +129,27 @@
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+    opacity: 0.7;
+}
+
+/* Button state styles */
+.natal-chart-submit-ready {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.natal-chart-submit-ready:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ea085 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+}
+
+.natal-chart-submit-disabled {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7;
 }
 
 .natal-chart-submit-loading {

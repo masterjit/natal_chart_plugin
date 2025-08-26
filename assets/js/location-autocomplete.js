@@ -42,6 +42,73 @@ class NatalChartLocationAutocomplete {
         
         // Click outside to close results
         document.addEventListener('click', (e) => this.handleClickOutside(e));
+        
+        // Add form validation events
+        this.bindFormValidationEvents();
+    }
+
+    bindFormValidationEvents() {
+        // Get all required form fields
+        const requiredFields = [
+            'natal_chart_name',
+            'natal_chart_birth_date',
+            'natal_chart_birth_time'
+        ];
+        
+        // Add input event listeners to all required fields
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('input', () => {
+                    this.validateField(field);
+                    this.updateSubmitButton();
+                });
+                field.addEventListener('change', () => {
+                    this.validateField(field);
+                    this.updateSubmitButton();
+                });
+                field.addEventListener('blur', () => {
+                    this.validateField(field);
+                    this.updateSubmitButton();
+                });
+            }
+        });
+        
+        // Initial button state and field validation
+        this.updateSubmitButton();
+        this.validateAllFields();
+    }
+
+    validateField(field) {
+        const value = field.value.trim();
+        const isValid = value !== '';
+        
+        // Remove existing validation classes
+        field.classList.remove('valid', 'invalid');
+        
+        // Add appropriate validation class
+        if (isValid) {
+            field.classList.add('valid');
+        } else {
+            field.classList.add('invalid');
+        }
+        
+        return isValid;
+    }
+
+    validateAllFields() {
+        const requiredFields = [
+            'natal_chart_name',
+            'natal_chart_birth_date',
+            'natal_chart_birth_time'
+        ];
+        
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                this.validateField(field);
+            }
+        });
     }
 
     handleSearchInput(e) {
@@ -305,6 +372,10 @@ class NatalChartLocationAutocomplete {
         
         // Trigger change event for form validation
         this.searchInput.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Log location selection
+        console.log('Location selected:', locationData.label);
+        console.log('Form validation status:', this.isFormValid());
     }
 
     populateFormFields(location) {
@@ -331,13 +402,40 @@ class NatalChartLocationAutocomplete {
         
         this.hideResultsContainer();
         this.updateSubmitButton();
+        
+        // Log selection cleared
+        console.log('Location selection cleared');
+        console.log('Form validation status:', this.isFormValid());
     }
 
     updateSubmitButton() {
         const submitButton = document.getElementById('natal_chart_submit');
         if (submitButton) {
             const isFormValid = this.isFormValid();
+            
+            // Update button state
             submitButton.disabled = !isFormValid;
+            
+            // Add visual feedback
+            if (isFormValid) {
+                submitButton.classList.add('natal-chart-submit-ready');
+                submitButton.classList.remove('natal-chart-submit-disabled');
+                console.log('Submit button: ENABLED - All fields are filled');
+            } else {
+                submitButton.classList.remove('natal-chart-submit-ready');
+                submitButton.classList.add('natal-chart-submit-disabled');
+                console.log('Submit button: DISABLED - Some fields are missing');
+            }
+            
+            // Update button text to show current state
+            const submitText = submitButton.querySelector('.natal-chart-submit-text');
+            if (submitText) {
+                if (isFormValid) {
+                    submitText.textContent = 'Generate Report';
+                } else {
+                    submitText.textContent = 'Generate Report';
+                }
+            }
         }
     }
 
@@ -350,14 +448,25 @@ class NatalChartLocationAutocomplete {
         
         // Check if location is selected
         if (!this.selectedLocation) {
+            console.log('Form validation: Location not selected');
             return false;
         }
         
         // Check other required fields
-        return requiredFields.every(fieldId => {
+        const allFieldsValid = requiredFields.every(fieldId => {
             const field = document.getElementById(fieldId);
-            return field && field.value.trim() !== '';
+            const isValid = field && field.value.trim() !== '';
+            if (!isValid) {
+                console.log(`Form validation: Field ${fieldId} is empty`);
+            }
+            return isValid;
         });
+        
+        if (allFieldsValid) {
+            console.log('Form validation: All fields are valid - submit button enabled');
+        }
+        
+        return allFieldsValid;
     }
 
     clearLocationError() {
