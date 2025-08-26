@@ -1,421 +1,333 @@
 /**
- * Location Autocomplete for Natal Chart Plugin
- * 
- * Handles location search with debouncing and field auto-population
+ * Location Autocomplete for Natal Chart Form
+ * Handles location search and selection with debouncing
  */
 
-(function($) {
-    'use strict';
-    
-    class NatalChartLocationAutocomplete {
-        constructor() {
-            this.searchInput = null;
-            this.resultsContainer = null;
-            this.searchTimeout = null;
-            this.isSearching = false;
-            this.minSearchLength = 2;
-            this.debounceDelay = 300;
-            this.selectedLocation = null;
-            
-            this.init();
-        }
+class NatalChartLocationAutocomplete {
+    constructor() {
+        this.searchInput = null;
+        this.resultsContainer = null;
+        this.selectedLocation = null;
+        this.searchTimeout = null;
+        this.isSearching = false;
         
-        init() {
+        this.init();
+    }
+
+    init() {
+        this.searchInput = document.getElementById('natal_chart_location_search');
+        this.resultsContainer = document.getElementById('natal_chart_location_results');
+        
+        if (this.searchInput) {
             this.bindEvents();
-            this.setupFormValidation();
-        }
-        
-        bindEvents() {
-            // Location search input events
-            $(document).on('input', '#natal_chart_location_search', (e) => {
-                this.handleSearchInput(e.target.value);
-            });
-            
-            // Location search input focus
-            $(document).on('focus', '#natal_chart_location_search', (e) => {
-                this.showResultsContainer();
-            });
-            
-            // Location search input blur
-            $(document).on('blur', '#natal_chart_location_search', (e) => {
-                // Delay hiding to allow click on results
-                setTimeout(() => {
-                    this.hideResultsContainer();
-                }, 200);
-            });
-            
-            // Location result selection
-            $(document).on('click', '.natal-chart-location-result', (e) => {
-                e.preventDefault();
-                this.selectLocation($(e.currentTarget).data('location'));
-            });
-            
-            // Keyboard navigation
-            $(document).on('keydown', '#natal_chart_location_search', (e) => {
-                this.handleKeyboardNavigation(e);
-            });
-            
-            // Clear location button
-            $(document).on('click', '.natal-chart-clear-location', (e) => {
-                e.preventDefault();
-                this.clearLocation();
-            });
-            
-            // Form submission
-            $(document).on('submit', '#natal_chart_form', (e) => {
-                if (!this.validateLocationSelection()) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-        }
-        
-        handleSearchInput(query) {
-            const trimmedQuery = query.trim();
-            
-            // Clear previous timeout
-            if (this.searchTimeout) {
-                clearTimeout(this.searchTimeout);
-            }
-            
-            // Clear results if query is too short
-            if (trimmedQuery.length < this.minSearchLength) {
-                this.clearResults();
-                this.updateSubmitButton();
-                return;
-            }
-            
-            // Set new timeout for debounced search
-            this.searchTimeout = setTimeout(() => {
-                this.performSearch(trimmedQuery);
-            }, this.debounceDelay);
-        }
-        
-        performSearch(query) {
-            if (this.isSearching) {
-                return;
-            }
-            
-            this.isSearching = true;
-            this.showLoadingState();
-            
-            $.ajax({
-                url: natal_chart_ajax.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'natal_chart_search_locations',
-                    query: query,
-                    nonce: natal_chart_ajax.nonce
-                },
-                success: (response) => {
-                    this.handleSearchSuccess(response, query);
-                },
-                error: (xhr, status, error) => {
-                    this.handleSearchError(error);
-                },
-                complete: () => {
-                    this.isSearching = false;
-                    this.hideLoadingState();
-                }
-            });
-        }
-        
-        handleSearchSuccess(response, query) {
-            if (response.success && response.data && response.data.results) {
-                this.displayResults(response.data.results, query);
-            } else {
-                this.displayNoResults(query);
-            }
-        }
-        
-        handleSearchError(error) {
-            console.error('Location search error:', error);
-            this.displayError(natal_chart_ajax.strings.error);
-        }
-        
-        displayResults(results, query) {
-            if (!results || results.length === 0) {
-                this.displayNoResults(query);
-                return;
-            }
-            
-            let html = '<div class="natal-chart-location-results-list">';
-            
-            results.forEach((location) => {
-                html += `
-                    <div class="natal-chart-location-result" data-location='${JSON.stringify(location)}'>
-                        <div class="natal-chart-location-label">${this.escapeHtml(location.label)}</div>
-                        <div class="natal-chart-location-details">
-                            <span class="natal-chart-location-timezone">${this.escapeHtml(location.timezone)}</span>
-                            ${location.population ? `<span class="natal-chart-location-population">${this.formatPopulation(location.population)}</span>` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            
-            this.resultsContainer.html(html);
-            this.showResultsContainer();
-        }
-        
-        displayNoResults(query) {
-            const html = `
-                <div class="natal-chart-location-no-results">
-                    <div class="natal-chart-location-no-results-message">
-                        ${natal_chart_ajax.strings.no_results}
-                    </div>
-                    <div class="natal-chart-location-no-results-query">
-                        "${this.escapeHtml(query)}"
-                    </div>
-                </div>
-            `;
-            
-            this.resultsContainer.html(html);
-            this.showResultsContainer();
-        }
-        
-        displayError(message) {
-            const html = `
-                <div class="natal-chart-location-error">
-                    <div class="natal-chart-location-error-message">
-                        ${this.escapeHtml(message)}
-                    </div>
-                </div>
-            `;
-            
-            this.resultsContainer.html(html);
-            this.showResultsContainer();
-        }
-        
-        selectLocation(location) {
-            this.selectedLocation = location;
-            
-            // Populate hidden fields
-            $('#natal_chart_location').val(location.label);
-            $('#natal_chart_latitude').val(location.latitude);
-            $('#natal_chart_longitude').val(location.longitude);
-            $('#natal_chart_timezone').val(location.timezone);
-            $('#natal_chart_offset').val(location.offset);
-            $('#natal_chart_offset_round').val(location.offset_round);
-            
-            // Update search input
-            $('#natal_chart_location_search').val(location.label);
-            
-            // Add selected state styling
-            $('#natal_chart_location_search').addClass('natal-chart-location-selected');
-            
-            // Show clear button
-            this.showClearButton();
-            
-            // Hide results
-            this.hideResultsContainer();
-            
-            // Update submit button state
-            this.updateSubmitButton();
-            
-            // Clear any previous errors
-            this.clearLocationError();
-            
-            // Trigger change event
-            $('#natal_chart_location_search').trigger('change');
-        }
-        
-        clearLocation() {
-            this.selectedLocation = null;
-            
-            // Clear hidden fields
-            $('#natal_chart_location').val('');
-            $('#natal_chart_latitude').val('');
-            $('#natal_chart_longitude').val('');
-            $('#natal_chart_timezone').val('');
-            $('#natal_chart_offset').val('');
-            $('#natal_chart_offset_round').val('');
-            
-            // Clear search input
-            $('#natal_chart_location_search').val('');
-            
-            // Remove selected state styling
-            $('#natal_chart_location_search').removeClass('natal-chart-location-selected');
-            
-            // Hide clear button
-            this.hideClearButton();
-            
-            // Update submit button state
-            this.updateSubmitButton();
-            
-            // Clear results
-            this.clearResults();
-            
-            // Focus on search input
-            $('#natal_chart_location_search').focus();
-        }
-        
-        showClearButton() {
-            if ($('.natal-chart-clear-location').length === 0) {
-                const clearButton = $(`
-                    <button type="button" class="natal-chart-clear-location" title="${natal_chart_ajax.strings.clear_location || 'Clear location'}">
-                        ×
-                    </button>
-                `);
-                
-                $('#natal_chart_location_search').after(clearButton);
-            }
-        }
-        
-        hideClearButton() {
-            $('.natal-chart-clear-location').remove();
-        }
-        
-        showResultsContainer() {
-            if (this.resultsContainer && this.resultsContainer.children().length > 0) {
-                this.resultsContainer.show();
-            }
-        }
-        
-        hideResultsContainer() {
-            if (this.resultsContainer) {
-                this.resultsContainer.hide();
-            }
-        }
-        
-        clearResults() {
-            if (this.resultsContainer) {
-                this.resultsContainer.empty().hide();
-            }
-        }
-        
-        showLoadingState() {
-            if (this.resultsContainer) {
-                const loadingHtml = `
-                    <div class="natal-chart-location-loading">
-                        <div class="natal-chart-spinner"></div>
-                        <div class="natal-chart-loading-text">${natal_chart_ajax.strings.searching}</div>
-                    </div>
-                `;
-                
-                this.resultsContainer.html(loadingHtml).show();
-            }
-        }
-        
-        hideLoadingState() {
-            // Loading state is handled by success/error callbacks
-        }
-        
-        handleKeyboardNavigation(e) {
-            const results = $('.natal-chart-location-result');
-            const currentIndex = results.index('.natal-chart-location-result.selected');
-            
-            switch (e.keyCode) {
-                case 38: // Up arrow
-                    e.preventDefault();
-                    this.navigateResults(results, currentIndex, -1);
-                    break;
-                    
-                case 40: // Down arrow
-                    e.preventDefault();
-                    this.navigateResults(results, currentIndex, 1);
-                    break;
-                    
-                case 13: // Enter
-                    e.preventDefault();
-                    if (results.filter('.selected').length > 0) {
-                        const locationData = results.filter('.selected').data('location');
-                        this.selectLocation(locationData);
-                    }
-                    break;
-                    
-                case 27: // Escape
-                    this.hideResultsContainer();
-                    $('#natal_chart_location_search').blur();
-                    break;
-            }
-        }
-        
-        navigateResults(results, currentIndex, direction) {
-            if (results.length === 0) return;
-            
-            results.removeClass('selected');
-            
-            let newIndex = currentIndex + direction;
-            
-            if (newIndex < 0) {
-                newIndex = results.length - 1;
-            } else if (newIndex >= results.length) {
-                newIndex = 0;
-            }
-            
-            results.eq(newIndex).addClass('selected');
-            
-            // Scroll into view if needed
-            const selectedResult = results.eq(newIndex);
-            if (selectedResult.length > 0) {
-                selectedResult[0].scrollIntoView({ block: 'nearest' });
-            }
-        }
-        
-        validateLocationSelection() {
-            if (!this.selectedLocation) {
-                this.showLocationError(natal_chart_ajax.strings.required_field);
-                return false;
-            }
-            
-            return true;
-        }
-        
-        showLocationError(message) {
-            this.clearLocationError();
-            
-            const errorHtml = `<div class="natal-chart-form-error">${this.escapeHtml(message)}</div>`;
-            $('#natal_chart_location_search_error').html(errorHtml);
-            
-            // Scroll to error
-            $('#natal_chart_location_search_error')[0].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        }
-        
-        clearLocationError() {
-            $('#natal_chart_location_search_error').empty();
-        }
-        
-        updateSubmitButton() {
-            const submitButton = $('#natal_chart_submit');
-            const hasLocation = this.selectedLocation !== null;
-            
-            if (hasLocation) {
-                submitButton.prop('disabled', false);
-            } else {
-                submitButton.prop('disabled', true);
-            }
-        }
-        
-        setupFormValidation() {
-            // Initialize submit button as disabled
-            this.updateSubmitButton();
-            
-            // Get references to DOM elements
-            this.searchInput = $('#natal_chart_location_search');
-            this.resultsContainer = $('#natal_chart_location_results');
-        }
-        
-        escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        formatPopulation(population) {
-            if (population >= 1000000) {
-                return (population / 1000000).toFixed(1) + 'M';
-            } else if (population >= 1000) {
-                return (population / 1000).toFixed(1) + 'K';
-            }
-            return population.toString();
         }
     }
-    
-    // Initialize when document is ready
-    $(document).ready(function() {
-        new NatalChartLocationAutocomplete();
-    });
-    
-})(jQuery);
+
+    bindEvents() {
+        // Search input events
+        this.searchInput.addEventListener('input', (e) => this.handleSearchInput(e));
+        this.searchInput.addEventListener('focus', () => this.handleSearchFocus());
+        this.searchInput.addEventListener('blur', () => this.handleSearchBlur());
+        this.searchInput.addEventListener('keydown', (e) => this.handleSearchKeydown(e));
+        
+        // Click outside to close results
+        document.addEventListener('click', (e) => this.handleClickOutside(e));
+    }
+
+    handleSearchInput(e) {
+        const query = e.target.value.trim();
+        
+        // Clear previous timeout
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
+        
+        // Clear selected location if input is cleared
+        if (!query) {
+            this.clearSelection();
+            return;
+        }
+        
+        // Debounce search
+        this.searchTimeout = setTimeout(() => {
+            if (query.length >= 2) {
+                this.searchLocations(query);
+            } else {
+                this.hideResultsContainer();
+            }
+        }, 300);
+    }
+
+    handleSearchFocus() {
+        if (this.searchInput.value.trim().length >= 2 && !this.selectedLocation) {
+            this.showResultsContainer();
+        }
+    }
+
+    handleSearchBlur() {
+        // Delay hiding to allow for clicks on results
+        setTimeout(() => {
+            if (!this.resultsContainer.matches(':hover')) {
+                this.hideResultsContainer();
+            }
+        }, 150);
+    }
+
+    handleSearchKeydown(e) {
+        const results = this.resultsContainer.querySelectorAll('.natal-chart-location-result');
+        const currentIndex = Array.from(results).findIndex(result => result.classList.contains('selected'));
+        
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                this.navigateResults(results, currentIndex, 1);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                this.navigateResults(results, currentIndex, -1);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (currentIndex >= 0) {
+                    this.selectLocation(results[currentIndex]);
+                }
+                break;
+            case 'Escape':
+                this.hideResultsContainer();
+                this.searchInput.blur();
+                break;
+        }
+    }
+
+    handleClickOutside(e) {
+        if (!this.searchInput.contains(e.target) && !this.resultsContainer.contains(e.target)) {
+            this.hideResultsContainer();
+        }
+    }
+
+    navigateResults(results, currentIndex, direction) {
+        if (results.length === 0) return;
+        
+        // Remove current selection
+        if (currentIndex >= 0) {
+            results[currentIndex].classList.remove('selected');
+        }
+        
+        // Calculate new index
+        let newIndex = currentIndex + direction;
+        if (newIndex < 0) newIndex = results.length - 1;
+        if (newIndex >= results.length) newIndex = 0;
+        
+        // Add new selection
+        results[newIndex].classList.add('selected');
+        results[newIndex].scrollIntoView({ block: 'nearest' });
+    }
+
+    async searchLocations(query) {
+        if (this.isSearching) return;
+        
+        this.isSearching = true;
+        this.showSearchingState();
+        
+        try {
+            const response = await fetch(natal_chart_ajax.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'natal_chart_search_locations',
+                    nonce: natal_chart_ajax.nonce,
+                    query: query
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayResults(data.data);
+            } else {
+                this.showError(data.data.message || natal_chart_ajax.strings.error);
+            }
+        } catch (error) {
+            console.error('Location search error:', error);
+            this.showError(natal_chart_ajax.strings.error);
+        } finally {
+            this.isSearching = false;
+        }
+    }
+
+    showSearchingState() {
+        this.resultsContainer.innerHTML = `
+            <div class="natal-chart-location-loading">
+                <span class="natal-chart-spinner"></span>
+                <span class="natal-chart-loading-text">${natal_chart_ajax.strings.searching}</span>
+            </div>
+        `;
+        this.showResultsContainer();
+    }
+
+    displayResults(locations) {
+        if (!locations || locations.length === 0) {
+            this.showNoResults();
+            return;
+        }
+        
+        const resultsHTML = locations.map(location => `
+            <div class="natal-chart-location-result" data-location='${JSON.stringify(location)}'>
+                <div class="city-name">${this.escapeHtml(location.label)}</div>
+                <div class="city-details">
+                    ${location.country ? location.country : ''}
+                    ${location.timezone ? ` • ${location.timezone}` : ''}
+                    ${location.population ? ` • Pop: ${this.formatNumber(location.population)}` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        this.resultsContainer.innerHTML = resultsHTML;
+        this.showResultsContainer();
+        this.bindResultEvents();
+    }
+
+    showNoResults() {
+        this.resultsContainer.innerHTML = `
+            <div class="natal-chart-location-no-results">
+                <div class="natal-chart-location-no-results-message">${natal_chart_ajax.strings.no_results}</div>
+            </div>
+        `;
+        this.showResultsContainer();
+    }
+
+    showError(message) {
+        this.resultsContainer.innerHTML = `
+            <div class="natal-chart-location-error">
+                <div class="natal-chart-location-error-message">${this.escapeHtml(message)}</div>
+            </div>
+        `;
+        this.showResultsContainer();
+    }
+
+    bindResultEvents() {
+        const results = this.resultsContainer.querySelectorAll('.natal-chart-location-result');
+        
+        results.forEach(result => {
+            result.addEventListener('click', () => this.selectLocation(result));
+            result.addEventListener('mouseenter', () => {
+                results.forEach(r => r.classList.remove('selected'));
+                result.classList.add('selected');
+            });
+        });
+    }
+
+    selectLocation(resultElement) {
+        const locationData = JSON.parse(resultElement.dataset.location);
+        this.selectedLocation = locationData;
+        
+        // Populate form fields
+        this.populateFormFields(locationData);
+        
+        // Update UI
+        this.searchInput.value = locationData.label;
+        this.searchInput.classList.add('natal-chart-location-selected');
+        this.hideResultsContainer();
+        
+        // Trigger form validation update
+        this.updateSubmitButton();
+        this.clearLocationError();
+        
+        // Trigger change event for form validation
+        this.searchInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    populateFormFields(location) {
+        // Populate hidden fields
+        document.getElementById('natal_chart_location').value = location.label;
+        document.getElementById('natal_chart_latitude').value = location.latitude || '';
+        document.getElementById('natal_chart_longitude').value = location.longitude || '';
+        document.getElementById('natal_chart_timezone').value = location.timezone || '';
+        document.getElementById('natal_chart_offset').value = location.offset || '';
+        document.getElementById('natal_chart_offset_round').value = location.offset_round || '';
+    }
+
+    clearSelection() {
+        this.selectedLocation = null;
+        this.searchInput.classList.remove('natal-chart-location-selected');
+        
+        // Clear all location-related fields
+        document.getElementById('natal_chart_location').value = '';
+        document.getElementById('natal_chart_latitude').value = '';
+        document.getElementById('natal_chart_longitude').value = '';
+        document.getElementById('natal_chart_timezone').value = '';
+        document.getElementById('natal_chart_offset').value = '';
+        document.getElementById('natal_chart_offset_round').value = '';
+        
+        this.hideResultsContainer();
+        this.updateSubmitButton();
+    }
+
+    updateSubmitButton() {
+        const submitButton = document.getElementById('natal_chart_submit');
+        if (submitButton) {
+            const isFormValid = this.isFormValid();
+            submitButton.disabled = !isFormValid;
+        }
+    }
+
+    isFormValid() {
+        const requiredFields = [
+            'natal_chart_name',
+            'natal_chart_birth_date',
+            'natal_chart_birth_time'
+        ];
+        
+        // Check if location is selected
+        if (!this.selectedLocation) {
+            return false;
+        }
+        
+        // Check other required fields
+        return requiredFields.every(fieldId => {
+            const field = document.getElementById(fieldId);
+            return field && field.value.trim() !== '';
+        });
+    }
+
+    clearLocationError() {
+        const errorElement = document.getElementById('natal_chart_location_search_error');
+        if (errorElement) {
+            errorElement.classList.remove('show');
+        }
+    }
+
+    showResultsContainer() {
+        if (this.resultsContainer) {
+            this.resultsContainer.style.display = 'block';
+        }
+    }
+
+    hideResultsContainer() {
+        if (this.resultsContainer) {
+            this.resultsContainer.style.display = 'none';
+        }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toString();
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new NatalChartLocationAutocomplete();
+});

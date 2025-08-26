@@ -4,8 +4,8 @@
  * Plugin URI: https://yourwebsite.com/natal-chart-plugin
  * Description: Generate natal charts using external astrology API services with location autocomplete and form handling.
  * Version: 1.0.0
- * Author: Your Name
- * Author URI: https://yourwebsite.com
+ * Author: Astrology Cosmic
+ * Author URI: https://astrologycosmic.com
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: natal-chart-plugin
@@ -146,13 +146,14 @@ class Natal_Chart_Plugin {
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('natal_chart_nonce'),
                 'strings' => array(
-                    'loading' => __('Loading...', 'natal-chart-plugin'),
-                    'error' => __('An error occurred. Please try again.', 'natal-chart-plugin'),
-                    'required_field' => __('This field is required.', 'natal-chart-plugin'),
-                    'invalid_date' => __('Please enter a valid date.', 'natal-chart-plugin'),
-                    'invalid_time' => __('Please enter a valid time.', 'natal-chart-plugin'),
-                    'searching' => __('Searching locations...', 'natal-chart-plugin'),
-                    'no_results' => __('No locations found.', 'natal-chart-plugin'),
+                                           'loading' => __('Loading...', 'natal-chart-plugin'),
+                       'error' => __('An error occurred. Please try again.', 'natal-chart-plugin'),
+                       'required_field' => __('This field is required.', 'natal-chart-plugin'),
+                       'invalid_date' => __('Please enter a valid date.', 'natal-chart-plugin'),
+                       'invalid_time' => __('Please enter a valid time.', 'natal-chart-plugin'),
+                       'searching' => __('Searching locations...', 'natal-chart-plugin'),
+                       'no_results' => __('No locations found.', 'natal-chart-plugin'),
+                       'generating_report' => __('Generating Report...', 'natal-chart-plugin'),
                 )
             ));
         }

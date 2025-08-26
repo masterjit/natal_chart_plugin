@@ -4,276 +4,87 @@
  * Modern, responsive styling for the natal chart form
  */
 
-/* Form Container */
+/* Natal Chart Form Styles */
 .natal-chart-form-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    line-height: 1.6;
-    color: #333;
 }
 
-/* Form Header */
-.natal-chart-form-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    color: white;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-}
-
-.natal-chart-form-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0 0 15px 0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.natal-chart-form-description {
-    font-size: 1.1rem;
-    margin: 0;
-    opacity: 0.9;
-    font-weight: 300;
-}
-
-/* Form Styling */
 .natal-chart-form {
-    background: white;
-    padding: 30px;
+    background: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e8ed;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
 }
 
-/* Form Rows */
-.natal-chart-form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+.natal-chart-form-group {
     margin-bottom: 25px;
 }
 
-.natal-chart-form-row:last-child {
-    margin-bottom: 0;
+.natal-chart-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-.natal-chart-form-field-full {
-    grid-column: 1 / -1;
-}
-
-/* Form Fields */
-.natal-chart-form-field {
-    position: relative;
+.natal-chart-form-col {
+    display: flex;
+    flex-direction: column;
 }
 
 .natal-chart-form-label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2d3748;
-    font-size: 0.95rem;
+    color: #333;
+    font-size: 14px;
 }
 
 .natal-chart-form-label .required {
-    color: #e53e3e;
+    color: #e74c3c;
     margin-left: 4px;
 }
 
 .natal-chart-form-input {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #e1e8ed;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 16px;
     transition: all 0.3s ease;
-    background: #fafafa;
-    color: #2d3748;
+    box-sizing: border-box;
 }
 
 .natal-chart-form-input:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
-.natal-chart-form-input:hover {
-    border-color: #cbd5e0;
-    background: white;
+.natal-chart-form-input:read-only {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+    border-color: #dee2e6;
 }
 
-.natal-chart-form-input.natal-chart-location-selected {
-    border-color: #48bb78;
-    background: #f0fff4;
+.natal-chart-form-input:read-only:focus {
+    border-color: #dee2e6;
+    box-shadow: none;
 }
 
-/* Location Search Container */
-.natal-chart-location-search-container {
-    position: relative;
-}
-
-.natal-chart-location-search {
-    padding-right: 50px;
-}
-
-.natal-chart-clear-location {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #e53e3e;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 16px;
-    line-height: 1;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.natal-chart-clear-location:hover {
-    background: #c53030;
-    transform: translateY(-50%) scale(1.1);
-}
-
-/* Location Results */
-.natal-chart-location-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    max-height: 300px;
-    overflow-y: auto;
-    display: none;
-}
-
-.natal-chart-location-results-list {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-
-.natal-chart-location-result {
-    padding: 12px 16px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.natal-chart-location-result:last-child {
-    border-bottom: none;
-}
-
-.natal-chart-location-result:hover,
-.natal-chart-location-result.selected {
-    background: #f7fafc;
-    border-left: 4px solid #667eea;
-    padding-left: 12px;
-}
-
-.natal-chart-location-label {
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 4px;
-}
-
-.natal-chart-location-details {
-    display: flex;
-    gap: 15px;
-    font-size: 0.85rem;
-    color: #718096;
-}
-
-.natal-chart-location-timezone {
-    background: #edf2f7;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-}
-
-.natal-chart-location-population {
-    background: #e6fffa;
-    padding: 2px 8px;
-    border-radius: 4px;
-    color: #234e52;
-    font-weight: 500;
-}
-
-/* Loading States */
-.natal-chart-location-loading {
-    padding: 20px;
-    text-align: center;
-    color: #718096;
-}
-
-.natal-chart-spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #e2e8f0;
-    border-radius: 50%;
-    border-top-color: #667eea;
-    animation: spin 1s ease-in-out infinite;
-    margin-right: 10px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.natal-chart-loading-text {
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-/* No Results & Error States */
-.natal-chart-location-no-results,
-.natal-chart-location-error {
-    padding: 20px;
-    text-align: center;
-    color: #718096;
-}
-
-.natal-chart-location-no-results-message {
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-
-.natal-chart-location-no-results-query {
-    font-size: 0.9rem;
-    color: #a0aec0;
-    font-style: italic;
-}
-
-.natal-chart-location-error-message {
-    color: #e53e3e;
-    font-weight: 500;
-}
-
-/* Submit Button */
 .natal-chart-form-submit {
     width: 100%;
-    padding: 16px 24px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
+    padding: 16px 24px;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -283,15 +94,11 @@
 
 .natal-chart-form-submit:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-}
-
-.natal-chart-form-submit:active:not(:disabled) {
-    transform: translateY(0);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
 .natal-chart-form-submit:disabled {
-    background: #cbd5e0;
+    background: #bdc3c7;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
@@ -304,182 +111,134 @@
     gap: 10px;
 }
 
-/* Form Messages */
-.natal-chart-form-messages {
+.natal-chart-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Location Search Styles */
+.natal-chart-location-search {
+    position: relative;
+}
+
+.natal-chart-location-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e1e8ed;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.natal-chart-location-result {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f3f4;
+    transition: background-color 0.2s ease;
+}
+
+.natal-chart-location-result:hover {
+    background-color: #f8f9fa;
+}
+
+.natal-chart-location-result:last-child {
+    border-bottom: none;
+}
+
+.natal-chart-location-result .city-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.natal-chart-location-result .city-details {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.natal-chart-location-selected {
+    background-color: #e8f5e8;
+    border-color: #28a745;
+}
+
+/* Location Data Fields */
+.natal-chart-location-data {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.natal-chart-location-data .natal-chart-form-label {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.natal-chart-location-data .natal-chart-form-input {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+/* Results Styles */
+.natal-chart-results {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
     margin-top: 20px;
 }
 
-.natal-chart-form-message {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    font-weight: 500;
-}
-
-.natal-chart-form-message-success {
-    background: #f0fff4;
-    color: #22543d;
-    border: 1px solid #9ae6b4;
-}
-
-.natal-chart-form-message-error {
-    background: #fed7d7;
-    color: #742a2a;
-    border: 1px solid #feb2b2;
-}
-
-/* Form Errors */
-.natal-chart-form-error {
-    color: #e53e3e;
-    font-size: 0.85rem;
-    margin-top: 5px;
-    font-weight: 500;
-}
-
-.natal-chart-form-error-field {
-    border-color: #e53e3e !important;
-    background: #fed7d7 !important;
-}
-
-/* Results Section */
-.natal-chart-results {
-    margin-top: 30px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e1e8ed;
-    overflow: hidden;
-}
-
 .natal-chart-results-header {
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    color: white;
-    padding: 20px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e1e8ed;
 }
 
 .natal-chart-results-header h3 {
     margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
+    color: #333;
+    font-size: 24px;
 }
 
 .natal-chart-close-results {
-    background: rgba(255, 255, 255, 0.2);
+    background: #6c757d;
     color: white;
     border: none;
     padding: 8px 16px;
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
 }
 
 .natal-chart-close-results:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: #5a6268;
 }
 
 .natal-chart-results-content {
-    padding: 30px;
-}
-
-/* Personal Info Grid */
-.natal-chart-personal-info h4 {
-    color: #2d3748;
-    margin-bottom: 20px;
-    font-size: 1.3rem;
-    font-weight: 600;
-}
-
-.natal-chart-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.natal-chart-info-item {
-    background: #f7fafc;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
-
-.natal-chart-info-item strong {
-    color: #4a5568;
-    font-weight: 600;
-    display: block;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.natal-chart-info-item span {
-    color: #2d3748;
-    font-size: 1rem;
-}
-
-/* Chart Data */
-.natal-chart-chart-data h4 {
-    color: #2d3748;
-    margin-bottom: 20px;
-    font-size: 1.3rem;
-    font-weight: 600;
-}
-
-.natal-chart-json-data {
-    background: #2d3748;
-    color: #e2e8f0;
-    padding: 20px;
-    border-radius: 8px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    overflow-x: auto;
-    border: 1px solid #4a5568;
-}
-
-/* Actions */
-.natal-chart-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-}
-
-.natal-chart-actions button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.95rem;
-}
-
-.natal-chart-actions button:hover {
-    transform: translateY(-1px);
-}
-
-.natal-chart-actions .button-secondary {
-    background: #e2e8f0;
-    color: #4a5568;
-}
-
-.natal-chart-actions .button-secondary:hover {
-    background: #cbd5e0;
-}
-
-.natal-chart-actions .button-primary {
-    background: #667eea;
-    color: white;
-}
-
-.natal-chart-actions .button-primary:hover {
-    background: #5a67d8;
+    line-height: 1.6;
+    color: #333;
 }
 
 /* Responsive Design */
@@ -497,92 +256,65 @@
         gap: 15px;
     }
     
-    .natal-chart-form-title {
-        font-size: 2rem;
-    }
-    
-    .natal-chart-info-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .natal-chart-actions {
-        flex-direction: column;
-    }
-    
-    .natal-chart-actions button {
-        width: 100%;
+    .natal-chart-location-data {
+        padding: 12px;
     }
 }
 
-@media (max-width: 480px) {
-    .natal-chart-form-container {
-        padding: 10px;
-    }
-    
-    .natal-chart-form {
-        padding: 15px;
-    }
-    
-    .natal-chart-form-title {
-        font-size: 1.8rem;
-    }
-    
-    .natal-chart-form-header {
-        padding: 15px;
-    }
+/* Loading States */
+.natal-chart-form.loading .natal-chart-form-input {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.natal-chart-form.loading .natal-chart-form-submit {
+    pointer-events: none;
+}
+
+/* Error States */
+.natal-chart-form-input.error {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.natal-chart-form-error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none;
+}
+
+.natal-chart-form-error.show {
+    display: block;
+}
+
+/* Success States */
+.natal-chart-form-input.success {
+    border-color: #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+/* Accessibility */
+.natal-chart-form-input:focus-visible {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+.natal-chart-form-submit:focus-visible {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
 }
 
 /* Print Styles */
 @media print {
     .natal-chart-form,
-    .natal-chart-actions,
+    .natal-chart-form-submit,
     .natal-chart-close-results {
-        display: none !important;
+        display: none;
     }
     
     .natal-chart-results {
         box-shadow: none;
-        border: none;
-    }
-    
-    .natal-chart-results-header {
-        background: #48bb78 !important;
-        -webkit-print-color-adjust: exact;
-        color-adjust: exact;
-    }
-}
-
-/* Accessibility */
-.natal-chart-form-input:focus-visible {
-    outline: 2px solid #667eea;
-    outline-offset: 2px;
-}
-
-.natal-chart-form-submit:focus-visible {
-    outline: 2px solid #667eea;
-    outline-offset: 2px;
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    .natal-chart-form-input {
-        border-width: 3px;
-    }
-    
-    .natal-chart-form-submit {
-        border: 2px solid #000;
-    }
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-    .natal-chart-form-input,
-    .natal-chart-form-submit,
-    .natal-chart-location-result {
-        transition: none;
-    }
-    
-    .natal-chart-spinner {
-        animation: none;
+        border: 1px solid #ccc;
     }
 }

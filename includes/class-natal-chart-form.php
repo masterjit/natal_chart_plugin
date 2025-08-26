@@ -32,124 +32,123 @@ class Natal_Chart_Form {
      * @param array $atts Shortcode attributes
      * @return string Form HTML
      */
-    public function render_form($atts = array()) {
-        // Parse attributes
+    public function render_natal_chart_form($atts = array()) {
         $atts = shortcode_atts(array(
-            'title' => __('Generate Your Natal Chart', 'natal-chart-plugin'),
-            'description' => __('Enter your birth details to generate your personalized natal chart.', 'natal-chart-plugin'),
-            'button_text' => __('Generate Chart', 'natal-chart-plugin'),
+            'title' => __('Natal Chart Generator', 'natal-chart-plugin'),
+            'button_text' => __('Generate Report', 'natal-chart-plugin'),
             'show_results' => 'true'
-        ), $atts, 'natal_chart_form');
-        
+        ), $atts);
+
         ob_start();
         ?>
-        <div class="natal-chart-form-container" id="natal-chart-form-container">
-            <div class="natal-chart-form-header">
-                <h2 class="natal-chart-form-title"><?php echo esc_html($atts['title']); ?></h2>
-                <?php if (!empty($atts['description'])): ?>
-                    <p class="natal-chart-form-description"><?php echo esc_html($atts['description']); ?></p>
-                <?php endif; ?>
-            </div>
-            
+        <div class="natal-chart-form-container">
             <form id="natal-chart-form" class="natal-chart-form" method="post">
-                <?php wp_nonce_field('natal_chart_form_nonce', 'natal_chart_nonce'); ?>
+                <?php wp_nonce_field('natal_chart_nonce', 'natal_chart_nonce'); ?>
                 
-                <div class="natal-chart-form-row">
-                    <div class="natal-chart-form-field">
-                        <label for="natal_chart_name" class="natal-chart-form-label">
-                            <?php _e('Full Name', 'natal-chart-plugin'); ?> <span class="required">*</span>
-                        </label>
-                        <input type="text" 
-                               id="natal_chart_name" 
-                               name="natal_chart_name" 
-                               class="natal-chart-form-input" 
-                               required 
-                               placeholder="<?php esc_attr_e('Enter your full name', 'natal-chart-plugin'); ?>" />
-                        <div class="natal-chart-form-error" id="natal_chart_name_error"></div>
-                    </div>
-                </div>
-                
-                <div class="natal-chart-form-row">
-                    <div class="natal-chart-form-field">
-                        <label for="natal_chart_birth_date" class="natal-chart-form-label">
-                            <?php _e('Birth Date', 'natal-chart-plugin'); ?> <span class="required">*</span>
-                        </label>
-                        <input type="date" 
-                               id="natal_chart_birth_date" 
-                               name="natal_chart_birth_date" 
-                               class="natal-chart-form-input" 
-                               required />
-                        <div class="natal-chart-form-error" id="natal_chart_birth_date_error"></div>
-                    </div>
+                <!-- Birth Location Section (First) -->
+                <div class="natal-chart-form-group">
+                    <label for="natal_chart_location_search" class="natal-chart-form-label">
+                        <?php _e('Birth Location', 'natal-chart-plugin'); ?> <span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           id="natal_chart_location_search" 
+                           name="natal_chart_location_search" 
+                           class="natal-chart-form-input natal-chart-location-search" 
+                           placeholder="<?php esc_attr_e('Start typing to search for a city...', 'natal-chart-plugin'); ?>" 
+                           required />
+                    <div class="natal-chart-location-results" id="natal-chart-location-results"></div>
                     
-                    <div class="natal-chart-form-field">
-                        <label for="natal_chart_birth_time" class="natal-chart-form-label">
-                            <?php _e('Birth Time', 'natal-chart-plugin'); ?> <span class="required">*</span>
-                        </label>
-                        <input type="time" 
-                               id="natal_chart_birth_time" 
-                               name="natal_chart_birth_time" 
-                               class="natal-chart-form-input" 
-                               required />
-                        <div class="natal-chart-form-error" id="natal_chart_birth_time_error"></div>
-                    </div>
-                </div>
-                
-                <div class="natal-chart-form-row">
-                    <div class="natal-chart-form-field natal-chart-form-field-full">
-                        <label for="natal_chart_location_search" class="natal-chart-form-label">
-                            <?php _e('Birth Location', 'natal-chart-plugin'); ?> <span class="required">*</span>
-                        </label>
-                        <div class="natal-chart-location-search-container">
-                            <input type="text" 
-                                   id="natal_chart_location_search" 
-                                   name="natal_chart_location_search" 
-                                   class="natal-chart-form-input natal-chart-location-search" 
-                                   required 
-                                   placeholder="<?php esc_attr_e('Start typing city name (minimum 2 characters)', 'natal-chart-plugin'); ?>" 
-                                   autocomplete="off" />
-                            <div class="natal-chart-location-results" id="natal_chart_location_results"></div>
+                    <!-- Readonly Location Data Fields -->
+                    <div class="natal-chart-location-data">
+                        <div class="natal-chart-form-row">
+                            <div class="natal-chart-form-col">
+                                <label for="natal_chart_latitude" class="natal-chart-form-label">
+                                    <?php _e('Latitude', 'natal-chart-plugin'); ?>
+                                </label>
+                                <input type="text" 
+                                       id="natal_chart_latitude" 
+                                       name="natal_chart_latitude" 
+                                       class="natal-chart-form-input" 
+                                       readonly />
+                            </div>
+                            <div class="natal-chart-form-col">
+                                <label for="natal_chart_longitude" class="natal-chart-form-label">
+                                    <?php _e('Longitude', 'natal-chart-plugin'); ?>
+                                </label>
+                                <input type="text" 
+                                       id="natal_chart_longitude" 
+                                       name="natal_chart_longitude" 
+                                       class="natal-chart-form-input" 
+                                       readonly />
+                            </div>
+                            <div class="natal-chart-form-col">
+                                <label for="natal_chart_offset_round" class="natal-chart-form-label">
+                                    <?php _e('Timezone Offset', 'natal-chart-plugin'); ?>
+                                </label>
+                                <input type="text" 
+                                       id="natal_chart_offset_round" 
+                                       name="natal_chart_offset_round" 
+                                       class="natal-chart-form-input" 
+                                       readonly />
+                            </div>
                         </div>
-                        <div class="natal-chart-form-error" id="natal_chart_location_search_error"></div>
                     </div>
                 </div>
-                
+
+                <!-- Other Form Fields -->
+                <div class="natal-chart-form-group">
+                    <label for="natal_chart_name" class="natal-chart-form-label">
+                        <?php _e('Full Name', 'natal-chart-plugin'); ?> <span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           id="natal_chart_name" 
+                           name="natal_chart_name" 
+                           class="natal-chart-form-input" 
+                           placeholder="<?php esc_attr_e('Enter your full name', 'natal-chart-plugin'); ?>" 
+                           required />
+                </div>
+
+                <div class="natal-chart-form-group">
+                    <label for="natal_chart_birth_date" class="natal-chart-form-label">
+                        <?php _e('Birth Date', 'natal-chart-plugin'); ?> <span class="required">*</span>
+                    </label>
+                    <input type="date" 
+                           id="natal_chart_birth_date" 
+                           name="natal_chart_birth_date" 
+                           class="natal-chart-form-input" 
+                           required />
+                </div>
+
+                <div class="natal-chart-form-group">
+                    <label for="natal_chart_birth_time" class="natal-chart-form-label">
+                        <?php _e('Birth Time', 'natal-chart-plugin'); ?> <span class="required">*</span>
+                    </label>
+                    <input type="time" 
+                           id="natal_chart_birth_time" 
+                           name="natal_chart_birth_time" 
+                           class="natal-chart-form-input" 
+                           required />
+                </div>
+
                 <!-- Hidden fields for location data -->
                 <input type="hidden" id="natal_chart_location" name="natal_chart_location" />
-                <input type="hidden" id="natal_chart_latitude" name="natal_chart_latitude" />
-                <input type="hidden" id="natal_chart_longitude" name="natal_chart_longitude" />
                 <input type="hidden" id="natal_chart_timezone" name="natal_chart_timezone" />
                 <input type="hidden" id="natal_chart_offset" name="natal_chart_offset" />
-                <input type="hidden" id="natal_chart_offset_round" name="natal_chart_offset_round" />
-                
-                <div class="natal-chart-form-row">
-                    <div class="natal-chart-form-field natal-chart-form-field-full">
-                        <button type="submit" 
-                                id="natal_chart_submit" 
-                                class="natal-chart-form-submit" 
-                                disabled>
-                            <span class="natal-chart-submit-text"><?php echo esc_html($atts['button_text']); ?></span>
-                            <span class="natal-chart-submit-loading" style="display: none;">
-                                <span class="natal-chart-spinner"></span>
-                                <?php _e('Generating Chart...', 'natal-chart-plugin'); ?>
-                            </span>
-                        </button>
-                    </div>
+
+                <div class="natal-chart-form-group">
+                    <button type="submit" id="natal_chart_submit" class="natal-chart-form-submit" disabled>
+                        <span class="natal-chart-submit-text"><?php echo esc_html($atts['button_text']); ?></span>
+                        <span class="natal-chart-submit-loading" style="display: none;">
+                            <span class="natal-chart-spinner"></span>
+                            <?php _e('Generating Report...', 'natal-chart-plugin'); ?>
+                        </span>
+                    </button>
                 </div>
-                
-                <div class="natal-chart-form-messages" id="natal-chart-form-messages"></div>
             </form>
-            
+
+            <!-- Results Container -->
             <?php if ($atts['show_results'] === 'true'): ?>
-                <div class="natal-chart-results" id="natal-chart-results" style="display: none;">
-                    <div class="natal-chart-results-header">
-                        <h3><?php _e('Your Natal Chart', 'natal-chart-plugin'); ?></h3>
-                        <button type="button" class="natal-chart-close-results" id="natal-chart-close-results">
-                            <?php _e('Close', 'natal-chart-plugin'); ?>
-                        </button>
-                    </div>
-                    <div class="natal-chart-results-content" id="natal-chart-results-content"></div>
-                </div>
+            <div id="natal-chart-results" class="natal-chart-results" style="display: none;"></div>
             <?php endif; ?>
         </div>
         <?php
