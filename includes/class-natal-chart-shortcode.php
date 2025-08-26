@@ -1,8 +1,9 @@
 <?php
 /**
- * Shortcode Handler Class for Natal Chart Plugin
+ * Natal Chart Shortcode Handler
  * 
- * Handles shortcode registration and rendering
+ * @package Natal_Chart_Plugin
+ * @since 1.0.0
  */
 
 // Prevent direct access
@@ -10,6 +11,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Handles shortcode registration and rendering
+ */
 class Natal_Chart_Shortcode {
     
     /**
@@ -21,307 +25,175 @@ class Natal_Chart_Shortcode {
     }
     
     /**
-     * Render natal chart form shortcode
+     * Render the natal chart form shortcode
      * 
      * @param array $atts Shortcode attributes
      * @return string Form HTML
      */
-    public function render_natal_chart_form($atts) {
-        // Parse attributes
-        $atts = shortcode_atts(array(
-            'title' => '',
-            'description' => '',
-            'button_text' => '',
-            'show_results' => 'true',
-            'form_id' => 'natal-chart-form',
-            'class' => '',
-            'style' => ''
-        ), $atts, 'natal_chart_form');
-        
-        // Initialize form class
+    public function render_natal_chart_form($atts = array()) {
+        // Get the form instance and render the form
         $form = new Natal_Chart_Form();
-        
-        // Render form
-        $form_html = $form->render_form($atts);
-        
-        // Add custom classes and styles
-        $container_class = 'natal-chart-shortcode-container';
-        if (!empty($atts['class'])) {
-            $container_class .= ' ' . esc_attr($atts['class']);
-        }
-        
-        $container_style = '';
-        if (!empty($atts['style'])) {
-            $container_style = ' style="' . esc_attr($atts['style']) . '"';
-        }
-        
-        return sprintf(
-            '<div class="%s" id="%s"%s>%s</div>',
-            esc_attr($container_class),
-            esc_attr($atts['form_id'] . '-container'),
-            $container_style,
-            $form_html
-        );
+        return $form->render_natal_chart_form($atts);
     }
     
     /**
-     * Render natal chart results shortcode
+     * Render the natal chart results shortcode
      * 
      * @param array $atts Shortcode attributes
      * @return string Results HTML
      */
-    public function render_natal_chart_results($atts) {
-        // Parse attributes
+    public function render_natal_chart_results($atts = array()) {
         $atts = shortcode_atts(array(
             'title' => __('Your Natal Chart Results', 'natal-chart-plugin'),
-            'show_personal_info' => 'true',
-            'show_chart_data' => 'true',
-            'show_actions' => 'true',
-            'class' => '',
-            'style' => ''
-        ), $atts, 'natal_chart_results');
+            'show_actions' => 'true'
+        ), $atts);
         
-        // Check if we have results in session or transient
+        // Get results from session/transient
         $results = $this->get_stored_results();
         
-        if (empty($results)) {
-            return sprintf(
-                '<div class="natal-chart-no-results%s">%s</div>',
-                !empty($atts['class']) ? ' ' . esc_attr($atts['class']) : '',
-                __('No natal chart results available. Please generate a chart first.', 'natal-chart-plugin')
-            );
+        if (!$results) {
+            return '<div class="natal-chart-no-results">' . 
+                   __('No natal chart results found. Please generate a chart first.', 'natal-chart-plugin') . 
+                   '</div>';
         }
         
-        // Initialize form class for rendering results
-        $form = new Natal_Chart_Form();
+        ob_start();
+        ?>
+        <div class="natal-chart-results-shortcode">
+            <div class="natal-chart-results-header">
+                <h3><?php echo esc_html($atts['title']); ?></h3>
+            </div>
+            <div class="natal-chart-results-content">
+                <?php echo wp_kses_post($results); ?>
+            </div>
+            <?php if ($atts['show_actions'] === 'true'): ?>
+            <div class="natal-chart-results-actions">
+                <button type="button" class="natal-chart-print-results" onclick="window.print()">
+                    <?php _e('Print Results', 'natal-chart-plugin'); ?>
+                </button>
+                <button type="button" class="natal-chart-download-results" onclick="downloadResults()">
+                    <?php _e('Download PDF', 'natal-chart-plugin'); ?>
+                </button>
+                <button type="button" class="natal-chart-new-chart" onclick="generateNewChart()">
+                    <?php _e('Generate New Chart', 'natal-chart-plugin'); ?>
+                </button>
+            </div>
+            <?php endif; ?>
+        </div>
         
-        // Render results
-        $results_html = $form->render_results($results['chart_data'], $results['form_data']);
-        
-        // Add custom classes and styles
-        $container_class = 'natal-chart-results-shortcode-container';
-        if (!empty($atts['class'])) {
-            $container_class .= ' ' . esc_attr($atts['class']);
+        <script>
+        function downloadResults() {
+            // Implementation for PDF download
+            alert('PDF download functionality would be implemented here.');
         }
         
-        $container_style = '';
-        if (!empty($atts['style'])) {
-            $container_style = ' style="' . esc_attr($atts['style']) . '"';
+        function generateNewChart() {
+            // Clear results and show form
+            const resultsContainer = document.querySelector('.natal-chart-results-shortcode');
+            if (resultsContainer) {
+                resultsContainer.style.display = 'none';
+            }
+            
+            // Scroll to form if it exists on the page
+            const formContainer = document.querySelector('.natal-chart-form-container');
+            if (formContainer) {
+                formContainer.scrollIntoView({ behavior: 'smooth' });
+            }
         }
-        
-        return sprintf(
-            '<div class="%s"%s><h3>%s</h3>%s</div>',
-            esc_attr($container_class),
-            $container_style,
-            esc_html($atts['title']),
-            $results_html
-        );
+        </script>
+        <?php
+        return ob_get_clean();
     }
     
     /**
      * Get stored results from session or transient
      * 
-     * @return array|false Results data or false if none
+     * @return string|false Results HTML or false if not found
      */
     private function get_stored_results() {
-        // Try to get from transient first
-        $transient_key = 'natal_chart_results_' . $this->get_user_session_id();
-        $results = get_transient($transient_key);
-        
-        if ($results !== false) {
-            return $results;
-        }
-        
-        // Try to get from session if available
+        // Try to get from session first
         if (isset($_SESSION['natal_chart_results'])) {
             return $_SESSION['natal_chart_results'];
+        }
+        
+        // Try to get from transient
+        $user_id = get_current_user_id();
+        if ($user_id) {
+            $transient_key = 'natal_chart_results_' . $user_id;
+            $results = get_transient($transient_key);
+            if ($results !== false) {
+                return $results;
+            }
+        }
+        
+        // Try to get from cookie
+        if (isset($_COOKIE['natal_chart_results'])) {
+            $results = sanitize_text_field($_COOKIE['natal_chart_results']);
+            if ($results) {
+                return $results;
+            }
         }
         
         return false;
     }
     
     /**
-     * Get user session identifier
+     * Store results for later display
      * 
-     * @return string Session identifier
+     * @param string $results_html Results HTML content
+     * @param int $user_id User ID (optional)
+     * @return bool Success status
      */
-    private function get_user_session_id() {
-        // Use user ID if logged in, otherwise use IP address
-        if (is_user_logged_in()) {
-            return 'user_' . get_current_user_id();
+    public static function store_results($results_html, $user_id = null) {
+        if (!$user_id) {
+            $user_id = get_current_user_id();
         }
         
-        $ip = $this->get_user_ip();
-        return 'ip_' . md5($ip);
-    }
-    
-    /**
-     * Get user IP address
-     * 
-     * @return string User IP address
-     */
-    private function get_user_ip() {
-        $ip_keys = array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR');
-        
-        foreach ($ip_keys as $key) {
-            if (array_key_exists($key, $_SERVER) === true) {
-                foreach (explode(',', $_SERVER[$key]) as $ip) {
-                    $ip = trim($ip);
-                    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
-                        return $ip;
-                    }
-                }
-            }
+        // Store in session
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-        
-        return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    }
-    
-    /**
-     * Store results for later retrieval
-     * 
-     * @param array $chart_data Chart data from API
-     * @param array $form_data Original form data
-     */
-    public function store_results($chart_data, $form_data) {
-        $results = array(
-            'chart_data' => $chart_data,
-            'form_data' => $form_data,
-            'timestamp' => current_time('timestamp')
-        );
+        $_SESSION['natal_chart_results'] = $results_html;
         
         // Store in transient (expires in 1 hour)
-        $transient_key = 'natal_chart_results_' . $this->get_user_session_id();
-        set_transient($transient_key, $results, HOUR_IN_SECONDS);
-        
-        // Also store in session if available
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            $_SESSION['natal_chart_results'] = $results;
+        if ($user_id) {
+            $transient_key = 'natal_chart_results_' . $user_id;
+            set_transient($transient_key, $results_html, HOUR_IN_SECONDS);
         }
+        
+        // Store in cookie (expires in 1 hour)
+        $cookie_value = sanitize_text_field($results_html);
+        setcookie('natal_chart_results', $cookie_value, time() + HOUR_IN_SECONDS, '/');
+        
+        return true;
     }
     
     /**
      * Clear stored results
+     * 
+     * @param int $user_id User ID (optional)
+     * @return bool Success status
      */
-    public function clear_stored_results() {
-        $transient_key = 'natal_chart_results_' . $this->get_user_session_id();
-        delete_transient($transient_key);
-        
-        if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['natal_chart_results'])) {
-            unset($_SESSION['natal_chart_results']);
+    public static function clear_results($user_id = null) {
+        if (!$user_id) {
+            $user_id = get_current_user_id();
         }
-    }
-    
-    /**
-     * Get shortcode usage examples
-     * 
-     * @return string Usage examples HTML
-     */
-    public function get_usage_examples() {
-        ob_start();
-        ?>
-        <div class="natal-chart-shortcode-examples">
-            <h3><?php _e('Shortcode Usage Examples', 'natal-chart-plugin'); ?></h3>
-            
-            <h4><?php _e('Basic Form', 'natal-chart-plugin'); ?></h4>
-            <code>[natal_chart_form]</code>
-            
-            <h4><?php _e('Customized Form', 'natal-chart-plugin'); ?></h4>
-            <code>[natal_chart_form title="Custom Title" description="Custom description" button_text="Generate Now"]</code>
-            
-            <h4><?php _e('Form with Custom Styling', 'natal-chart-plugin'); ?></h4>
-            <code>[natal_chart_form class="my-custom-class" style="background: #f0f0f0; padding: 20px;"]</code>
-            
-            <h4><?php _e('Results Display', 'natal-chart-plugin'); ?></h4>
-            <code>[natal_chart_results]</code>
-            
-            <h4><?php _e('Customized Results', 'natal_chart-plugin'); ?></h4>
-            <code>[natal_chart_results title="Your Astrological Profile" show_actions="false"]</code>
-            
-            <h4><?php _e('Multiple Forms on Same Page', 'natal-chart-plugin'); ?></h4>
-            <code>[natal_chart_form form_id="form1" title="First Chart"]</code><br>
-            <code>[natal_chart_form form_id="form2" title="Second Chart"]</code>
-        </div>
-        <?php
-        return ob_get_clean();
-    }
-    
-    /**
-     * Get available shortcode attributes
-     * 
-     * @return array Available attributes
-     */
-    public function get_available_attributes() {
-        return array(
-            'natal_chart_form' => array(
-                'title' => array(
-                    'type' => 'string',
-                    'default' => __('Generate Your Natal Chart', 'natal-chart-plugin'),
-                    'description' => __('Custom title for the form', 'natal-chart-plugin')
-                ),
-                'description' => array(
-                    'type' => 'string',
-                    'default' => __('Enter your birth details to generate your personalized natal chart.', 'natal-chart-plugin'),
-                    'description' => __('Custom description text', 'natal-chart-plugin')
-                ),
-                'button_text' => array(
-                    'type' => 'string',
-                    'default' => __('Generate Chart', 'natal-chart-plugin'),
-                    'description' => __('Custom submit button text', 'natal-chart-plugin')
-                ),
-                'show_results' => array(
-                    'type' => 'boolean',
-                    'default' => 'true',
-                    'description' => __('Whether to show results after form submission', 'natal-chart-plugin')
-                ),
-                'form_id' => array(
-                    'type' => 'string',
-                    'default' => 'natal-chart-form',
-                    'description' => __('Custom form ID for styling or JavaScript targeting', 'natal-chart-plugin')
-                ),
-                'class' => array(
-                    'type' => 'string',
-                    'default' => '',
-                    'description' => __('Additional CSS classes for styling', 'natal-chart-plugin')
-                ),
-                'style' => array(
-                    'type' => 'string',
-                    'default' => '',
-                    'description' => __('Inline CSS styles', 'natal-chart-plugin')
-                )
-            ),
-            'natal_chart_results' => array(
-                'title' => array(
-                    'type' => 'string',
-                    'default' => __('Your Natal Chart Results', 'natal-chart-plugin'),
-                    'description' => __('Custom title for results section', 'natal-chart-plugin')
-                ),
-                'show_personal_info' => array(
-                    'type' => 'boolean',
-                    'default' => 'true',
-                    'description' => __('Whether to show personal information section', 'natal-chart-plugin')
-                ),
-                'show_chart_data' => array(
-                    'type' => 'boolean',
-                    'default' => 'true',
-                    'description' => __('Whether to show chart data section', 'natal-chart-plugin')
-                ),
-                'show_actions' => array(
-                    'type' => 'boolean',
-                    'default' => 'true',
-                    'description' => __('Whether to show action buttons', 'natal-chart-plugin')
-                ),
-                'class' => array(
-                    'type' => 'string',
-                    'default' => '',
-                    'description' => __('Additional CSS classes for styling', 'natal-chart-plugin')
-                ),
-                'style' => array(
-                    'type' => 'string',
-                    'default' => '',
-                    'description' => __('Inline CSS styles', 'natal-chart-plugin')
-                )
-            )
-        );
+        
+        // Clear from session
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        unset($_SESSION['natal_chart_results']);
+        
+        // Clear from transient
+        if ($user_id) {
+            $transient_key = 'natal_chart_results_' . $user_id;
+            delete_transient($transient_key);
+        }
+        
+        // Clear from cookie
+        setcookie('natal_chart_results', '', time() - 3600, '/');
+        
+        return true;
     }
 }
