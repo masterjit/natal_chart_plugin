@@ -51,9 +51,15 @@ class Natal_Chart_Shortcode {
         // Get results from session/transient
         $results = $this->get_stored_results();
         
+        // Debug: Log what we found
+        error_log('Natal Chart Results Shortcode Debug:');
+        error_log('- Results found: ' . ($results ? 'YES' : 'NO'));
+        error_log('- Results content: ' . substr($results ?: 'NULL', 0, 200));
+        
         if (!$results) {
             return '<div class="natal-chart-no-results">' . 
                    __('No natal chart results found. Please generate a chart first.', 'natal-chart-plugin') . 
+                   '<br><small>Debug: No stored results found in session/transient/cookie</small>' .
                    '</div>';
         }
         
@@ -111,9 +117,15 @@ class Natal_Chart_Shortcode {
      * @return string|false Results HTML or false if not found
      */
     private function get_stored_results() {
+        // Debug: Log what we're checking
+        error_log('Natal Chart Get Stored Results Debug:');
+        
         // Try to get from session first
         if (isset($_SESSION['natal_chart_results'])) {
+            error_log('- Found results in SESSION');
             return $_SESSION['natal_chart_results'];
+        } else {
+            error_log('- No results in SESSION');
         }
         
         // Try to get from transient
@@ -122,18 +134,29 @@ class Natal_Chart_Shortcode {
             $transient_key = 'natal_chart_results_' . $user_id;
             $results = get_transient($transient_key);
             if ($results !== false) {
+                error_log('- Found results in TRANSIENT: ' . $transient_key);
                 return $results;
+            } else {
+                error_log('- No results in TRANSIENT: ' . $transient_key);
             }
+        } else {
+            error_log('- No user ID available for transient');
         }
         
         // Try to get from cookie
         if (isset($_COOKIE['natal_chart_results'])) {
             $results = sanitize_text_field($_COOKIE['natal_chart_results']);
             if ($results) {
+                error_log('- Found results in COOKIE');
                 return $results;
+            } else {
+                error_log('- Cookie exists but is empty');
             }
+        } else {
+            error_log('- No results in COOKIE');
         }
         
+        error_log('- No results found in any storage method');
         return false;
     }
     
@@ -149,6 +172,12 @@ class Natal_Chart_Shortcode {
             $user_id = get_current_user_id();
         }
         
+        // Debug: Log what we're storing
+        error_log('Natal Chart Store Results Debug:');
+        error_log('- Results HTML length: ' . strlen($results_html));
+        error_log('- User ID: ' . $user_id);
+        error_log('- Results preview: ' . substr($results_html, 0, 200));
+        
         // Store in session
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -159,11 +188,13 @@ class Natal_Chart_Shortcode {
         if ($user_id) {
             $transient_key = 'natal_chart_results_' . $user_id;
             set_transient($transient_key, $results_html, HOUR_IN_SECONDS);
+            error_log('- Stored in transient: ' . $transient_key);
         }
         
         // Store in cookie (expires in 1 hour)
         $cookie_value = sanitize_text_field($results_html);
         setcookie('natal_chart_results', $cookie_value, time() + HOUR_IN_SECONDS, '/');
+        error_log('- Stored in cookie: natal_chart_results');
         
         return true;
     }
