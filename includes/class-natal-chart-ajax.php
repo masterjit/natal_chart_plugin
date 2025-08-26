@@ -151,11 +151,8 @@ class Natal_Chart_Ajax {
             wp_die(__('Security check failed.', 'natal-chart-plugin'));
         }
         
-        // Initialize shortcode class
-        $shortcode = new Natal_Chart_Shortcode();
-        
         // Clear results
-        $shortcode->clear_stored_results();
+        Natal_Chart_Shortcode::clear_results();
         
         wp_send_json_success(array(
             'message' => __('Results cleared successfully.', 'natal-chart-plugin')
