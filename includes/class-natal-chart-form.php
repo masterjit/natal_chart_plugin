@@ -89,10 +89,11 @@ class Natal_Chart_Form {
                                 <label for="natal_chart_offset_round" class="natal-chart-form-label">
                                     <?php _e('Timezone Offset', 'natal-chart-plugin'); ?>
                                 </label>
-                                <input type="text" 
+                                <input type="number" 
                                        id="natal_chart_offset_round" 
                                        name="natal_chart_offset_round" 
                                        class="natal-chart-form-input" 
+                                       step="0.1"
                                        readonly />
                             </div>
                         </div>

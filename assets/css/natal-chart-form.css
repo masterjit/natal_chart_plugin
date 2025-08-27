@@ -1307,3 +1307,38 @@
     border-color: #dee2e6 !important;
     box-shadow: none !important;
 }
+
+/* Timezone Offset Field Styling */
+#natal_chart_offset_round {
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    min-width: 80px;
+}
+
+#natal_chart_offset_round::-webkit-outer-spin-button,
+#natal_chart_offset_round::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#natal_chart_offset_round[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Ensure decimal values are displayed properly */
+#natal_chart_offset_round[readonly] {
+    background-color: #f8f9fa;
+    color: #495057;
+    cursor: not-allowed;
+}
+
+/* Force decimal display */
+#natal_chart_offset_round[value*="."] {
+    color: #495057 !important;
+}
+
+/* Prevent value truncation */
+#natal_chart_offset_round {
+    text-overflow: clip;
+    overflow: visible;
+}
