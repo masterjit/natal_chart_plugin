@@ -1568,3 +1568,49 @@ window.checkFormState = function() {
     
     return true;
 };
+
+// Toggle section functionality for natal chart results
+function toggleSection(toggleElement) {
+    const content = toggleElement.nextElementSibling;
+    const isCollapsed = content.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+        // Expand section
+        content.classList.remove('collapsed');
+        toggleElement.classList.remove('collapsed');
+    } else {
+        // Collapse section
+        content.classList.add('collapsed');
+        toggleElement.classList.add('collapsed');
+    }
+}
+
+// Initialize all sections as expanded by default
+function initializeToggleableSections() {
+    const toggles = document.querySelectorAll('.natal-chart-section-toggle');
+    toggles.forEach(toggle => {
+        toggle.classList.remove('collapsed');
+        const content = toggle.nextElementSibling;
+        if (content && content.classList.contains('natal-chart-section-content')) {
+            content.classList.remove('collapsed');
+        }
+    });
+}
+
+// Make toggleSection function globally available
+window.toggleSection = toggleSection;
+
+// Initialize sections when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initializeToggleableSections();
+});
+
+// Also initialize when results are loaded dynamically
+if (typeof window.initializeNatalChartFormManually === 'function') {
+    const originalInit = window.initializeNatalChartFormManually;
+    window.initializeNatalChartFormManually = function() {
+        originalInit();
+        // Initialize toggleable sections after form is set up
+        setTimeout(initializeToggleableSections, 100);
+    };
+}

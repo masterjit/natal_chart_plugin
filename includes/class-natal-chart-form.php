@@ -421,15 +421,16 @@ class Natal_Chart_Form {
                 </div>
             </div>
             
-            <div class="natal-chart-actions">
-                <button type="button" class="button button-primary" onclick="enableFormAndRefresh()">
-                    <?php _e('Generate New Chart', 'natal-chart-plugin'); ?>
-                </button>
-            </div>
+                    <div class="natal-chart-actions">
+            <button type="button" class="button button-primary" onclick="enableFormAndRefresh()">
+                <?php _e('Generate New Chart', 'natal-chart-plugin'); ?>
+            </button>
         </div>
-        <?php
-        return ob_get_clean();
-    }
+    </div>
+    
+    <?php
+    return ob_get_clean();
+}
 
     /**
      * Format natal chart data into beautiful HTML
@@ -584,13 +585,15 @@ class Natal_Chart_Form {
      */
     private function format_houses_section($houses) {
         $html = '<div class="natal-chart-section">';
-        $html .= '<h5 class="natal-chart-section-title">' . __('House Cusps', 'natal-chart-plugin') . '</h5>';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('House Cusps', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
         $html .= '<div class="natal-chart-houses-grid">';
         
         foreach ($houses as $house) {
             $html .= '<div class="natal-chart-house-item">';
-            $html .= '<div class="natal-chart-house-header">';
-            $html .= '<span class="natal-chart-house-number">' . esc_html($house['house'] ?? $house['number'] ?? '') . '</span>';
+            $html .= '<div class="natal-chart-house-header">';            
             $html .= '<span class="natal-chart-house-name">' . esc_html($this->get_house_name($house['house'] ?? $house['number'] ?? '')) . '</span>';
             $html .= '</div>';
             
@@ -611,6 +614,7 @@ class Natal_Chart_Form {
             $html .= '</div>';
         }
         
+        $html .= '</div>';
         $html .= '</div></div>';
         return $html;
     }
@@ -623,7 +627,10 @@ class Natal_Chart_Form {
      */
     private function format_aspects_section($aspects) {
         $html = '<div class="natal-chart-section">';
-        $html .= '<h5 class="natal-chart-section-title">' . __('Major Aspects', 'natal-chart-plugin') . '</h5>';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('Major Aspects', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
         $html .= '<div class="natal-chart-aspects-table">';
         $html .= '<table class="natal-chart-table">';
         $html .= '<thead><tr>';
@@ -642,7 +649,8 @@ class Natal_Chart_Form {
             $html .= '</tr>';
         }
         
-        $html .= '</tbody></table></div></div>';
+        $html .= '</tbody></table></div>';
+        $html .= '</div></div>';
         return $html;
     }
 
@@ -654,7 +662,10 @@ class Natal_Chart_Form {
      */
     private function format_angles_section($angles) {
         $html = '<div class="natal-chart-section">';
-        $html .= '<h5 class="natal-chart-section-title">' . __('Angular Points', 'natal-chart-plugin') . '</h5>';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('Angular Points', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
         $html .= '<div class="natal-chart-angles-grid">';
         
         $angle_types = [
@@ -678,6 +689,7 @@ class Natal_Chart_Form {
             }
         }
         
+        $html .= '</div>';
         $html .= '</div></div>';
         return $html;
     }
@@ -690,7 +702,10 @@ class Natal_Chart_Form {
      */
     private function format_lunar_nodes_section($nodes) {
         $html = '<div class="natal-chart-section">';
-        $html .= '<h5 class="natal-chart-section-title">' . __('Lunar Nodes', 'natal-chart-plugin') . '</h5>';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('Lunar Nodes', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
         $html .= '<div class="natal-chart-nodes-grid">';
         
         if (isset($nodes['north'])) {
@@ -715,6 +730,7 @@ class Natal_Chart_Form {
             $html .= '</div></div>';
         }
         
+        $html .= '</div>';
         $html .= '</div></div>';
         return $html;
     }

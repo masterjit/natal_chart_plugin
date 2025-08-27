@@ -531,12 +531,12 @@
 }
 
 .natal-chart-table-header {
-    background: #667eea;
-    color: white;
+    background: #414246 !important;
+    color: white !important;
     padding: 15px 20px;
     text-align: center;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 14px !important;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border: none;
@@ -555,8 +555,8 @@
 }
 
 .natal-chart-table th {
-    background: #667eea;
-    color: white;
+    background: #414246 !important;
+    color: white !important;
     padding: 12px 15px;
     text-align: center;
     font-weight: 600;
@@ -575,19 +575,14 @@
     background-color: #f8f9fa;
 }
 
-.natal-chart-aspect-type {
-    background: #394b59;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
+.natal-chart-aspect-type {    
+    color: rgb(0, 0, 0);
     font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    display: inline-flex;
     align-items: center;
     gap: 8px;
-    min-width: 120px;
     justify-content: center;
     white-space: nowrap;
 }
@@ -1104,7 +1099,7 @@
     
     .natal-chart-table-header {
         padding: 12px 15px;
-        font-size: 13px;
+        font-size: 13px !important;
     }
 }
 
@@ -1149,7 +1144,7 @@
     
     .natal-chart-table-header {
         padding: 10px 12px;
-        font-size: 12px;
+        font-size: 12px !important;
         letter-spacing: 0.3px;
     }
     
@@ -1448,7 +1443,7 @@
 
 .natal-chart-longitude-label {
     font-size: 11px;
-    color: #6c757d;
+    color: #000000;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -1478,7 +1473,7 @@
 
 .natal-chart-house-label {
     font-size: 11px;
-    color: #6c757d;
+    color: #000000;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -1597,5 +1592,151 @@
         align-self: stretch;
         text-align: center;
         margin-top: 4px;
+    }
+}
+
+/* Toggleable Sections */
+.natal-chart-section-toggle {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: #667eea;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.natal-chart-section-toggle:hover {
+    background: #5a6fd8;
+    transform: translateY(-1px);
+}
+
+.natal-chart-section-toggle::after {
+    content: '▼';
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    margin-left: 10px;
+}
+
+.natal-chart-section-toggle.collapsed::after {
+    transform: rotate(-90deg);
+}
+
+.natal-chart-section-content {
+    overflow: visible;
+    transition: max-height 0.5s ease-in-out;
+    background: white;    
+    border-radius: 8px;
+}
+
+.natal-chart-section-content.collapsed {
+    max-height: 0;
+    overflow: hidden;
+    border: none;
+}
+
+/* Section titles that are not toggleable */
+.natal-chart-section-title {
+    margin: 0 0 20px 0;
+    padding: 15px 20px;
+    background: #667eea;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Ensure proper spacing for toggleable sections */
+.natal-chart-section {
+    margin-bottom: 25px;
+}
+
+/* Animation for smooth transitions */
+.natal-chart-section-content > * {
+    transition: opacity 0.3s ease;
+}
+
+.natal-chart-section-content.collapsed > * {
+    opacity: 0;
+}
+
+/* Ensure table content is fully visible when expanded */
+.natal-chart-section-content:not(.collapsed) .natal-chart-aspects-table {
+    overflow: visible;
+}
+
+.natal-chart-section-content:not(.collapsed) .natal-chart-table {
+    display: table;
+    width: 100%;
+}
+
+.natal-chart-section-content:not(.collapsed) .natal-chart-table tbody {
+    display: table-row-group;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .natal-chart-section-toggle {
+        padding: 12px 15px;
+        font-size: 15px;
+    }
+    
+    .natal-chart-section-title {
+        padding: 12px 15px;
+        font-size: 15px;
+    }    
+    
+    
+    .natal-chart-table-header {
+        padding: 10px 12px !important;
+        font-size: 13px !important;
+        color: white !important;
+    }
+    
+    .natal-chart-table th {
+        padding: 10px 12px !important;
+        font-size: 13px !important;
+        color: white !important;
+    }
+
+    /* Table rows and cells for mobile */
+    .natal-chart-table td {
+        font-size: 13px !important;
+        padding: 10px 12px !important;
+    }
+    
+    .natal-chart-table tr {
+        font-size: 13px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .natal-chart-table-header {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+        color: white !important;
+        letter-spacing: 0.2px !important;
+    }
+    
+    .natal-chart-table th {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+        color: white !important;
+    }
+
+    /* Table rows and cells for small mobile */
+    .natal-chart-table td {
+        font-size: 12px !important;
+        padding: 8px 10px !important;
+    }
+    
+    .natal-chart-table tr {
+        font-size: 12px !important;
     }
 }
