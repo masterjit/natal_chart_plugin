@@ -179,7 +179,7 @@ class Natal_Chart_Ajax {
                     'longitude' => floatval($result['longitude']),
                     'timezone' => sanitize_text_field($result['timezone']),
                     'offset' => sanitize_text_field($result['offset'] ?? ''),
-                    'offset_round' => intval($result['offset_round'] ?? 0),
+                    'offset_round' => floatval($result['offset_round'] ?? 0),
                     'population' => intval($result['population'] ?? 0)
                 );
             }

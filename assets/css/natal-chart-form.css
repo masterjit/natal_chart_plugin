@@ -1342,3 +1342,260 @@
     text-overflow: clip;
     overflow: visible;
 }
+
+/* Planets Section */
+.natal-chart-planets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.natal-chart-planet-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.natal-chart-planet-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    border-color: #3498db;
+}
+
+.natal-chart-planet-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px 10px 0 0;
+}
+
+.natal-chart-planet-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.natal-chart-planet-symbol {
+    font-size: 24px;
+    color: #3498db;
+    font-weight: bold;
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(52, 152, 219, 0.15);
+    flex-shrink: 0;
+}
+
+.natal-chart-planet-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 16px;
+    text-transform: capitalize;
+}
+
+.natal-chart-planet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.natal-chart-planet-sign-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 6px;
+    color: white;
+}
+
+.natal-chart-planet-sign-symbol {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.natal-chart-planet-sign-name {
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.natal-chart-planet-longitude {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: rgba(52, 152, 219, 0.08);
+    border-radius: 5px;
+    border-left: 2px solid #3498db;
+}
+
+.natal-chart-longitude-label {
+    font-size: 11px;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    min-width: 50px;
+}
+
+.natal-chart-longitude-value {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    background: white;
+    padding: 3px 6px;
+    border-radius: 3px;
+    border: 1px solid #dee2e6;
+}
+
+.natal-chart-planet-house {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: rgba(40, 167, 69, 0.08);
+    border-radius: 5px;
+    border-left: 2px solid #28a745;
+}
+
+.natal-chart-house-label {
+    font-size: 11px;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    min-width: 40px;
+}
+
+.natal-chart-house-number {
+    background: #28a745;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.natal-chart-planet-retrograde {
+    background: #e74c3c;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 6px;
+    align-self: flex-start;
+}
+
+/* Responsive Design for Planets */
+@media (max-width: 768px) {
+    .natal-chart-planets-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+    }
+    
+    .natal-chart-planet-item {
+        padding: 12px;
+    }
+    
+    .natal-chart-planet-header {
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+    
+    .natal-chart-planet-symbol {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+    }
+    
+    .natal-chart-planet-name {
+        font-size: 15px;
+    }
+    
+    .natal-chart-planet-details {
+        gap: 6px;
+    }
+    
+    .natal-chart-planet-sign-info {
+        padding: 6px 10px;
+    }
+    
+    .natal-chart-planet-sign-symbol {
+        font-size: 16px;
+    }
+    
+    .natal-chart-planet-sign-name {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .natal-chart-planets-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .natal-chart-planet-item {
+        padding: 10px;
+    }
+    
+    .natal-chart-planet-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    
+    .natal-chart-planet-symbol {
+        align-self: center;
+    }
+    
+    .natal-chart-planet-details {
+        gap: 6px;
+    }
+    
+    .natal-chart-planet-sign-info,
+    .natal-chart-planet-longitude,
+    .natal-chart-planet-house {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        text-align: left;
+    }
+    
+    .natal-chart-longitude-label,
+    .natal-chart-house-label {
+        min-width: auto;
+    }
+    
+    .natal-chart-planet-retrograde {
+        align-self: stretch;
+        text-align: center;
+        margin-top: 4px;
+    }
+}

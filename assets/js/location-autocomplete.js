@@ -320,8 +320,6 @@ class NatalChartLocationAutocomplete {
                     <div class="city-details">
                         ${location.country ? location.country : ''}
                         ${location.timezone ? ` • ${location.timezone}` : ''}
-                        ${location.population ? ` • Pop: ${this.formatNumber(location.population)}` : ''}
-                        ${location.offset_round ? ` • ${location.offset_round}` : ''}
                     </div>
                 </div>
             `).join('');

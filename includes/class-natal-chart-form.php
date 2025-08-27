@@ -466,6 +466,11 @@ class Natal_Chart_Form {
             $html .= $this->format_chart_image_section($data['chart_url']);
         }
         
+        // Planets Section
+        if (isset($data['planets']) && is_array($data['planets'])) {
+            $html .= $this->format_planets_section($data['planets']);
+        }
+        
         // Houses Section
         if (isset($data['houses']) && is_array($data['houses'])) {
             $html .= $this->format_houses_section($data['houses']);
@@ -502,6 +507,72 @@ class Natal_Chart_Form {
         $html .= '<img src="' . esc_url($chart_url) . '" alt="' . __('Natal Chart', 'natal-chart-plugin') . '" class="natal-chart-image" />';
         $html .= '</div>';
         $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Format planets section
+     * 
+     * @param array $planets Planets data
+     * @return string Formatted HTML
+     */
+    private function format_planets_section($planets) {
+        $html = '<div class="natal-chart-section">';
+        $html .= '<h5 class="natal-chart-section-title">' . __('Planetary Positions', 'natal-chart-plugin') . '</h5>';
+        $html .= '<div class="natal-chart-planets-grid">';
+        
+        foreach ($planets as $planet) {
+            // Skip P. of Fortune and Vertex
+            $planet_name = strtolower(trim($planet['name'] ?? ''));
+            if (in_array($planet_name, ['p. of fortune', 'part of fortune', 'vertex'])) {
+                continue;
+            }
+            
+            $html .= '<div class="natal-chart-planet-item">';
+            
+            // Planet header with name and symbol
+            $html .= '<div class="natal-chart-planet-header">';
+            $html .= '<span class="natal-chart-planet-symbol">' . $this->get_planet_symbol($planet['name'] ?? '') . '</span>';
+            $html .= '<span class="natal-chart-planet-name">' . esc_html($planet['name'] ?? '') . '</span>';
+            $html .= '</div>';
+            
+            // Planet details
+            $html .= '<div class="natal-chart-planet-details">';
+            
+            // Sign with symbol
+            if (isset($planet['sign'])) {
+                $html .= '<div class="natal-chart-planet-sign-info">';
+                $html .= '<span class="natal-chart-planet-sign-symbol">' . $this->get_zodiac_symbol($planet['sign']) . '</span>';
+                $html .= '<span class="natal-chart-planet-sign-name">' . esc_html($planet['sign']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            // Longitude
+            if (isset($planet['longitude'])) {
+                $html .= '<div class="natal-chart-planet-longitude">';
+                $html .= '<span class="natal-chart-longitude-label">' . __('Position', 'natal-chart-plugin') . ':</span> ';
+                $html .= '<span class="natal-chart-longitude-value">' . $this->format_planet_longitude($planet['longitude']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            // House position
+            if (isset($planet['house_position'])) {
+                $html .= '<div class="natal-chart-planet-house">';
+                $html .= '<span class="natal-chart-house-label">' . __('House', 'natal-chart-plugin') . ':</span> ';
+                $html .= '<span class="natal-chart-house-number">' . esc_html($planet['house_position']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            // Retrograde indicator
+            if (isset($planet['retrograde']) && $planet['retrograde']) {
+                $html .= '<div class="natal-chart-planet-retrograde">℞ ' . __('Retrograde', 'natal-chart-plugin') . '</div>';
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div></div>';
         return $html;
     }
 
@@ -833,5 +904,66 @@ class Natal_Chart_Form {
         
         // Fallback: return as is if we can't parse it
         return esc_html($longitude);
+    }
+
+    /**
+     * Format planet longitude to user-friendly format
+     * 
+     * @param string $longitude Longitude string (e.g., "29 Pis 00' 30\"")
+     * @return string Formatted longitude (e.g., "29° 00' 30\"")
+     */
+    private function format_planet_longitude($longitude) {
+        // Extract degrees, minutes, seconds from format like "29 Pis 00' 30\""
+        if (preg_match('/(\d+)\s+[A-Za-z]+\s+(\d+)\'?\s*(\d+)\"?/', $longitude, $matches)) {
+            $degrees = $matches[1];
+            $minutes = $matches[2];
+            $seconds = $matches[3];
+            
+            return $degrees . '° ' . $minutes . "' " . $seconds . '"';
+        }
+        
+        // If it's already in a different format, try to extract just the numbers
+        if (preg_match('/(\d+)\s*[°\s]*(\d+)\s*[\'\s]*(\d+)\s*["\s]*/', $longitude, $matches)) {
+            $degrees = $matches[1];
+            $minutes = $matches[2];
+            $seconds = $matches[3];
+            
+            return $degrees . '° ' . $minutes . "' " . $seconds . '"';
+        }
+        
+        // Fallback: return as is if we can't parse it
+        return esc_html($longitude);
+    }
+
+    /**
+     * Get planet symbol
+     * 
+     * @param string $planet_name Planet name
+     * @return string Planet symbol
+     */
+    private function get_planet_symbol($planet_name) {
+        $symbols = [
+            'sun' => '☉',
+            'moon' => '☽',
+            'mercury' => '☿',
+            'venus' => '♀',
+            'mars' => '♂',
+            'jupiter' => '♃',
+            'saturn' => '♄',
+            'uranus' => '♅',
+            'neptune' => '♆',
+            'pluto' => '♇',
+            'chiron' => '⚷',
+            'lilith' => '⚸',
+            'node' => '☊',
+            'north node' => '☊',
+            'south node' => '☋',
+            'p. of fortune' => '⊗',
+            'part of fortune' => '⊗',
+            'vertex' => '⚸'
+        ];
+        
+        $key = strtolower(trim($planet_name));
+        return isset($symbols[$key]) ? $symbols[$key] : '';
     }
 }
