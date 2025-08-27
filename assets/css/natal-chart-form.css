@@ -786,8 +786,6 @@
 /* Action Buttons */
 .natal-chart-actions {
     display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
     justify-content: center;
     padding-top: 20px;
     border-top: 1px solid #e9ecef;
@@ -803,15 +801,6 @@
     transition: all 0.3s ease;
 }
 
-.natal-chart-actions .button-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.natal-chart-actions .button-secondary:hover {
-    background: #5a6268;
-}
-
 .natal-chart-actions .button-primary {
     background: #007cba;
     color: white;
@@ -819,6 +808,8 @@
 
 .natal-chart-actions .button-primary:hover {
     background: #005a87;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
 }
 
 /* Results Shortcode Styles */

@@ -168,21 +168,6 @@ class Natal_Chart_Form {
                             <?php _e('Generating Report...', 'natal-chart-plugin'); ?>
                         </span>
                     </button>
-                    
-                    <!-- Test Button for AJAX Debugging -->
-                    <button type="button" id="natal_chart_test_ajax" class="natal-chart-form-test" style="margin-left: 10px; background: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">
-                        Test AJAX
-                    </button>
-                </div>
-                
-                <!-- Debug Test Button -->
-                <div class="natal-chart-form-group" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; border: 1px dashed #dee2e6;">
-                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">
-                        <strong>Debug:</strong> Click this button to test form validation
-                    </p>
-                    <button type="button" onclick="testFormValidation()" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Test Form Validation
-                    </button>
                 </div>
             </form>
 
@@ -385,6 +370,9 @@ class Natal_Chart_Form {
     public function render_results($chart_data, $form_data) {
         ob_start();
         ?>
+        <div class="natal-chart-results-header">
+            <h3><?php _e('Your Natal Chart Results', 'natal-chart-plugin'); ?></h3>
+        </div>
         <div class="natal-chart-results-content">
             <div class="natal-chart-personal-info">
                 <h4><?php _e('Personal Information', 'natal-chart-plugin'); ?></h4>
@@ -436,13 +424,7 @@ class Natal_Chart_Form {
             </div>
             
             <div class="natal-chart-actions">
-                <button type="button" class="button button-secondary" id="natal-chart-print">
-                    <?php _e('Print Chart', 'natal-chart-plugin'); ?>
-                </button>
-                <button type="button" class="button button-secondary" id="natal-chart-download">
-                    <?php _e('Download Data', 'natal-chart-plugin'); ?>
-                </button>
-                <button type="button" class="button button-primary" id="natal-chart-new-chart">
+                <button type="button" class="button button-primary" onclick="location.reload()">
                     <?php _e('Generate New Chart', 'natal-chart-plugin'); ?>
                 </button>
             </div>

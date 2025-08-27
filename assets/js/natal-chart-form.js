@@ -173,80 +173,7 @@ class NatalChartForm {
             closeButton.addEventListener('click', () => this.closeResults());
         }
         
-        // Test AJAX button for debugging
-        const testAjaxButton = document.getElementById('natal_chart_test_ajax');
-        if (testAjaxButton) {
-            testAjaxButton.addEventListener('click', () => {
-                console.log('=== TEST AJAX BUTTON CLICKED ===');
-                this.testAjaxFunctionality();
-            });
-        }
-        
         console.log('Form events bound successfully');
-    }
-
-    testAjaxFunctionality() {
-        console.log('=== TESTING AJAX FUNCTIONALITY ===');
-        
-        // Check if AJAX variables are available
-        if (!window.natal_chart_ajax) {
-            console.error('❌ natal_chart_ajax not available!');
-            return;
-        }
-        
-        if (!window.natal_chart_ajax.ajax_url) {
-            console.error('❌ AJAX URL not available!');
-            return;
-        }
-        
-        console.log('✅ AJAX variables available:');
-        console.log('- AJAX URL:', window.natal_chart_ajax.ajax_url);
-        console.log('- Nonce:', window.natal_chart_ajax.nonce);
-        
-        // Test with a simple request
-        const testData = {
-            action: 'natal_chart_generate_chart',
-            natal_chart_name: 'Test User',
-            natal_chart_birth_date: '1990-01-01',
-            natal_chart_birth_time: '12:00',
-            natal_chart_timezone: 5.5,
-            natal_chart_latitude: 29.92009,
-            natal_chart_longitude: 73.87496,
-            natal_chart_house_system: 'p',
-            natal_chart_location: 'Test City, Test State, Test Country',
-            natal_chart_nonce: window.natal_chart_ajax.nonce
-        };
-        
-        console.log('Test data to send:', testData);
-        
-        // Make the request
-        fetch(window.natal_chart_ajax.ajax_url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(testData)
-        })
-        .then(response => {
-            console.log('✅ AJAX request sent successfully!');
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            return response.text();
-        })
-        .then(data => {
-            console.log('Response data:', data);
-            
-            // Try to parse as JSON
-            try {
-                const jsonData = JSON.parse(data);
-                console.log('Parsed JSON response:', jsonData);
-            } catch (e) {
-                console.log('Response is not valid JSON:', data);
-            }
-        })
-        .catch(error => {
-            console.error('❌ AJAX request failed:', error);
-        });
     }
 
     async handleSubmit(e) {
@@ -496,13 +423,7 @@ class NatalChartForm {
             console.log('✅ Results container found:', this.resultsContainer);
             console.log('Current display style:', this.resultsContainer.style.display);
             
-            this.resultsContainer.innerHTML = `
-                <div class="natal-chart-results-header">
-                    <h3>Your Natal Chart Report</h3>
-                    <button type="button" class="natal-chart-close-results" id="natal_chart_close_results">
-                        Close
-                    </button>
-                </div>
+            this.resultsContainer.innerHTML = `                
                 <div class="natal-chart-results-content">
                     ${resultsHtml}
                 </div>
@@ -528,13 +449,7 @@ class NatalChartForm {
             
             if (manualResults) {
                 console.log('✅ Found results container manually, updating it...');
-                manualResults.innerHTML = `
-                    <div class="natal-chart-results-header">
-                        <h3>Your Natal Chart Report</h3>
-                        <button type="button" class="natal-chart-close-results" id="natal_chart_close_results">
-                            Close
-                        </button>
-                    </div>
+                manualResults.innerHTML = `                    
                     <div class="natal-chart-results-content">
                         ${resultsHtml}
                     </div>
@@ -618,7 +533,7 @@ class NatalChartForm {
                     submitText.textContent = 'Generate Report';
                     console.log('Button text updated to: Generate Report');
                 } else {
-                    submitText.textContent = 'Fill All Fields to Generate Report';
+                    submitText.textContent = 'Generate Report';
                     console.log('Button text updated to: Fill All Fields to Generate Report');
                 }
             }
@@ -1000,75 +915,6 @@ window.simpleFormTest = function() {
     } else {
         console.log('Cannot run validation - method not available');
     }
-};
-
-// Global function to manually test form validation
-window.testFormValidation = function() {
-    console.log('=== MANUAL FORM VALIDATION TEST ===');
-    
-    if (!window.natalChartForm) {
-        console.error('❌ NatalChartForm not initialized!');
-        return false;
-    }
-    
-    console.log('✅ NatalChartForm found, testing validation...');
-    
-    // Test each field individually
-    const testFields = [
-        'natal_chart_name',
-        'natal_chart_birth_date', 
-        'natal_chart_birth_hour',
-        'natal_chart_birth_minute',
-        'natal_chart_birth_ampm'
-    ];
-    
-    testFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            console.log(`Field ${fieldId}:`, {
-                exists: true,
-                value: field.value,
-                trimmed: field.value.trim(),
-                valid: field.value.trim() !== ''
-            });
-        } else {
-            console.error(`❌ Field ${fieldId} NOT FOUND!`);
-        }
-    });
-    
-    // Test location field
-    const locationField = document.getElementById('natal_chart_location_search');
-    if (locationField) {
-        console.log('Location field:', {
-            exists: true,
-            value: locationField.value,
-            hasSelectedClass: locationField.classList.contains('natal-chart-location-selected'),
-            allClasses: locationField.className
-        });
-    } else {
-        console.error('❌ Location field NOT FOUND!');
-    }
-    
-    // Test submit button
-    const submitButton = document.getElementById('natal_chart_submit');
-    if (submitButton) {
-        console.log('Submit button:', {
-            exists: true,
-            disabled: submitButton.disabled,
-            classes: submitButton.className
-        });
-    } else {
-        console.error('❌ Submit button NOT FOUND!');
-    }
-    
-    // Run actual validation
-    const isValid = window.natalChartForm.isFormValid();
-    console.log('Form validation result:', isValid);
-    
-    // Force update submit button
-    window.natalChartForm.updateSubmitButton();
-    
-    return isValid;
 };
 
 // Global function to manually initialize the form (can be called from shortcode)
