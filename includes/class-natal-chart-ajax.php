@@ -99,14 +99,8 @@ class Natal_Chart_Ajax {
             ));
         }
         
-        // Store results for later retrieval
-        $shortcode = new Natal_Chart_Shortcode();
-        
-        // Render results HTML first
+        // Render results HTML for immediate display
         $results_html = $form->render_results($result['data'], $result['form_data']);
-        
-        // Store the rendered HTML results
-        $shortcode->store_results($results_html, $result['form_data']);
         
         wp_send_json_success(array(
             'message' => __('Natal chart generated successfully!', 'natal-chart-plugin'),

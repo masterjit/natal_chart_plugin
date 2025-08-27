@@ -186,10 +186,8 @@ class Natal_Chart_Form {
                 </div>
             </form>
 
-            <!-- Results Container -->
-            <?php if ($atts['show_results'] === 'true'): ?>
-            <div id="natal-chart-results" class="natal-chart-results" style="display: none;"></div>
-            <?php endif; ?>
+            <!-- Results Container - Always show for form functionality -->
+            <div id="natal_chart-results" class="natal-chart-results" style="display: none;"></div>
         </div>
         
         <script>
