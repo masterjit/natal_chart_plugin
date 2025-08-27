@@ -320,7 +320,6 @@ class NatalChartLocationAutocomplete {
                     <div class="city-details">
                         ${location.country ? location.country : ''}
                         ${location.timezone ? ` • ${location.timezone}` : ''}
-                        ${location.population ? ` • Pop: ${this.formatNumber(location.population)}` : ''}
                     </div>
                 </div>
             `).join('');
@@ -420,7 +419,52 @@ class NatalChartLocationAutocomplete {
         document.getElementById('natal_chart_longitude').value = location.longitude || '';
         document.getElementById('natal_chart_timezone').value = location.timezone || '';
         document.getElementById('natal_chart_offset').value = location.offset || '';
-        document.getElementById('natal_chart_offset_round').value = location.offset_round || '';
+        
+        // Ensure decimal precision for timezone offset
+        const offsetRound = location.offset_round;
+        console.log('🔍 Original offset_round value:', offsetRound, 'Type:', typeof offsetRound);
+        
+        if (offsetRound !== undefined && offsetRound !== null) {
+            // Convert to number and preserve exact decimal places
+            const offsetValue = parseFloat(offsetRound);
+            console.log('🔍 Parsed offset value:', offsetValue, 'Type:', typeof offsetValue);
+            
+            if (!isNaN(offsetValue)) {
+                // Don't use toFixed() to avoid rounding, preserve exact value
+                const formattedValue = offsetValue.toString();
+                console.log('🔍 Formatted value to set:', formattedValue);
+                
+                // Set the value directly without formatting
+                document.getElementById('natal_chart_offset_round').value = offsetValue;
+                
+                // Verify the value was set correctly
+                const actualValue = document.getElementById('natal_chart_offset_round').value;
+                console.log('🔍 Actual value in field after setting:', actualValue);
+                
+                // Force the display to show the exact value
+                const inputField = document.getElementById('natal_chart_offset_round');
+                inputField.setAttribute('value', offsetValue);
+                inputField.value = offsetValue;
+                
+                // Double-check the final value
+                console.log('🔍 Final value after force set:', inputField.value);
+                
+                // Test: Manually verify decimal display
+                setTimeout(() => {
+                    const testValue = inputField.value;
+                    console.log('🔍 Test after 100ms delay:', testValue);
+                    console.log('🔍 Test value type:', typeof testValue);
+                    console.log('🔍 Test value length:', testValue.length);
+                    console.log('🔍 Test value includes decimal:', testValue.includes('.'));
+                }, 100);
+            } else {
+                console.log('🔍 Invalid offset value, setting empty');
+                document.getElementById('natal_chart_offset_round').value = '';
+            }
+        } else {
+            console.log('🔍 No offset_round value, setting empty');
+            document.getElementById('natal_chart_offset_round').value = '';
+        }
     }
 
     clearSelection() {

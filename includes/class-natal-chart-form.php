@@ -42,7 +42,7 @@ class Natal_Chart_Form {
         ob_start();
         ?>
         <div class="natal-chart-form-container">
-            <form id="natal_chart_form" class="natal-chart-form" action="javascript:void(0)">
+            <form id="natal_chart_form" class="natal_chart_form" action="javascript:void(0)">
                 <?php wp_nonce_field('natal_chart_nonce', 'natal_chart_nonce'); ?>
                 
                 <!-- Birth Location Section (First) -->
@@ -89,10 +89,11 @@ class Natal_Chart_Form {
                                 <label for="natal_chart_offset_round" class="natal-chart-form-label">
                                     <?php _e('Timezone Offset', 'natal-chart-plugin'); ?>
                                 </label>
-                                <input type="text" 
+                                <input type="number" 
                                        id="natal_chart_offset_round" 
                                        name="natal_chart_offset_round" 
                                        class="natal-chart-form-input" 
+                                       step="0.1"
                                        readonly />
                             </div>
                         </div>
@@ -168,28 +169,11 @@ class Natal_Chart_Form {
                             <?php _e('Generating Report...', 'natal-chart-plugin'); ?>
                         </span>
                     </button>
-                    
-                    <!-- Test Button for AJAX Debugging -->
-                    <button type="button" id="natal_chart_test_ajax" class="natal-chart-form-test" style="margin-left: 10px; background: #ff6b6b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">
-                        Test AJAX
-                    </button>
-                </div>
-                
-                <!-- Debug Test Button -->
-                <div class="natal-chart-form-group" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; border: 1px dashed #dee2e6;">
-                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">
-                        <strong>Debug:</strong> Click this button to test form validation
-                    </p>
-                    <button type="button" onclick="testFormValidation()" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Test Form Validation
-                    </button>
                 </div>
             </form>
 
-            <!-- Results Container -->
-            <?php if ($atts['show_results'] === 'true'): ?>
-            <div id="natal-chart-results" class="natal-chart-results" style="display: none;"></div>
-            <?php endif; ?>
+            <!-- Results Container - Always show for form functionality -->
+            <div id="natal_chart-results" class="natal-chart-results" style="display: none;"></div>
         </div>
         
         <script>
@@ -430,27 +414,452 @@ class Natal_Chart_Form {
                 <h4><?php _e('Natal Chart Data', 'natal-chart-plugin'); ?></h4>
                 <div class="natal-chart-data-content">
                     <?php if (is_array($chart_data) && !empty($chart_data)): ?>
-                        <pre class="natal-chart-json-data"><?php echo esc_html(json_encode($chart_data, JSON_PRETTY_PRINT)); ?></pre>
+                        <?php echo $this->format_natal_chart_data($chart_data); ?>
                     <?php else: ?>
                         <p><?php _e('Chart data received successfully.', 'natal-chart-plugin'); ?></p>
                     <?php endif; ?>
                 </div>
             </div>
             
-            <div class="natal-chart-actions">
-                <button type="button" class="button button-secondary" id="natal-chart-print">
-                    <?php _e('Print Chart', 'natal-chart-plugin'); ?>
-                </button>
-                <button type="button" class="button button-secondary" id="natal-chart-download">
-                    <?php _e('Download Data', 'natal-chart-plugin'); ?>
-                </button>
-                <button type="button" class="button button-primary" id="natal-chart-new-chart">
-                    <?php _e('Generate New Chart', 'natal-chart-plugin'); ?>
-                </button>
-            </div>
+                    <div class="natal-chart-actions">
+            <button type="button" class="button button-primary" onclick="enableFormAndRefresh()">
+                <?php _e('Generate New Chart', 'natal-chart-plugin'); ?>
+            </button>
         </div>
-        <?php
-        return ob_get_clean();
+    </div>
+    
+    <?php
+    return ob_get_clean();
+}
+
+    /**
+     * Format natal chart data into beautiful HTML
+     * 
+     * @param array $chart_data Chart data from API
+     * @return string Formatted HTML
+     */
+    private function format_natal_chart_data($chart_data) {
+        $html = '';
+        
+        // Handle different data structures
+        if (isset($chart_data['planets']) || isset($chart_data['houses']) || isset($chart_data['aspects'])) {
+            $html .= $this->format_astrological_data($chart_data);
+        } elseif (isset($chart_data['chart']) || isset($chart_data['data'])) {
+            $html .= $this->format_nested_data($chart_data);
+        } else {
+            $html .= $this->format_generic_data($chart_data);
+        }
+        
+        return $html;
+    }
+
+    /**
+     * Format astrological data (planets, houses, aspects)
+     * 
+     * @param array $data Astrological data
+     * @return string Formatted HTML
+     */
+    private function format_astrological_data($data) {
+        $html = '<div class="natal-chart-astrological-data">';
+        
+        // Chart Image Section
+        if (isset($data['chart_url']) && !empty($data['chart_url'])) {
+            $html .= $this->format_chart_image_section($data['chart_url']);
+        }
+        
+        // Planets Section
+        if (isset($data['planets']) && is_array($data['planets'])) {
+            $html .= $this->format_planets_section($data['planets']);
+        }
+        
+        // Houses Section
+        if (isset($data['houses']) && is_array($data['houses'])) {
+            $html .= $this->format_houses_section($data['houses']);
+        }
+        
+        // Aspects Section
+        if (isset($data['aspects']) && is_array($data['aspects'])) {
+            $html .= $this->format_aspects_section($data['aspects']);
+        }
+        
+        // Additional astrological data
+        if (isset($data['angles'])) {
+            $html .= $this->format_angles_section($data['angles']);
+        }
+        
+        if (isset($data['lunar_nodes'])) {
+            $html .= $this->format_lunar_nodes_section($data['lunar_nodes']);
+        }
+        
+        $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Format chart image section
+     * 
+     * @param string $chart_url Chart image URL
+     * @return string Formatted HTML
+     */
+    private function format_chart_image_section($chart_url) {
+        $html = '<div class="natal-chart-section">';
+        $html .= '<h5 class="natal-chart-section-title">' . __('Natal Chart', 'natal-chart-plugin') . '</h5>';
+        $html .= '<div class="natal-chart-image-container">';
+        $html .= '<img src="' . esc_url($chart_url) . '" alt="' . __('Natal Chart', 'natal-chart-plugin') . '" class="natal-chart-image" />';
+        $html .= '</div>';
+        $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Format planets section
+     * 
+     * @param array $planets Planets data
+     * @return string Formatted HTML
+     */
+    private function format_planets_section($planets) {
+        $html = '<div class="natal-chart-section">';
+        $html .= '<h5 class="natal-chart-section-title">' . __('Planetary Positions', 'natal-chart-plugin') . '</h5>';
+        $html .= '<div class="natal-chart-planets-grid">';
+        
+        foreach ($planets as $planet) {
+            // Skip P. of Fortune and Vertex
+            $planet_name = strtolower(trim($planet['name'] ?? ''));
+            if (in_array($planet_name, ['p. of fortune', 'part of fortune', 'vertex'])) {
+                continue;
+            }
+            
+            $html .= '<div class="natal-chart-planet-item">';
+            
+            // Planet header with name and symbol
+            $html .= '<div class="natal-chart-planet-header">';
+            $html .= '<span class="natal-chart-planet-symbol">' . $this->get_planet_symbol($planet['name'] ?? '') . '</span>';
+            $html .= '<span class="natal-chart-planet-name">' . esc_html($planet['name'] ?? '') . '</span>';
+            $html .= '</div>';
+            
+            // Planet details
+            $html .= '<div class="natal-chart-planet-details">';
+            
+            // Sign with symbol
+            if (isset($planet['sign'])) {
+                $html .= '<div class="natal-chart-planet-sign-info">';
+                $html .= '<span class="natal-chart-planet-sign-symbol">' . $this->get_zodiac_symbol($planet['sign']) . '</span>';
+                $html .= '<span class="natal-chart-planet-sign-name">' . esc_html($planet['sign']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            // Longitude
+            if (isset($planet['longitude'])) {
+                $html .= '<div class="natal-chart-planet-longitude">';
+                $html .= '<span class="natal-chart-longitude-label">' . __('Position', 'natal-chart-plugin') . ':</span> ';
+                $html .= '<span class="natal-chart-longitude-value">' . $this->format_planet_longitude($planet['longitude']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            // House position
+            if (isset($planet['house_position'])) {
+                $html .= '<div class="natal-chart-planet-house">';
+                $html .= '<span class="natal-chart-house-label">' . __('House', 'natal-chart-plugin') . ':</span> ';
+                $html .= '<span class="natal-chart-house-number">' . esc_html($planet['house_position']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            // Retrograde indicator
+            if (isset($planet['retrograde']) && $planet['retrograde']) {
+                $html .= '<div class="natal-chart-planet-retrograde">℞ ' . __('Retrograde', 'natal-chart-plugin') . '</div>';
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div></div>';
+        return $html;
+    }
+
+    /**
+     * Format houses section
+     * 
+     * @param array $houses Houses data
+     * @return string Formatted HTML
+     */
+    private function format_houses_section($houses) {
+        $html = '<div class="natal-chart-section">';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('House Cusps', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-houses-grid">';
+        
+        foreach ($houses as $house) {
+            $html .= '<div class="natal-chart-house-item">';
+            $html .= '<div class="natal-chart-house-header">';            
+            $html .= '<span class="natal-chart-house-name">' . esc_html($this->get_house_name($house['house'] ?? $house['number'] ?? '')) . '</span>';
+            $html .= '</div>';
+            
+            if (isset($house['sign'])) {
+                $html .= '<div class="natal-chart-house-sign">';
+                $html .= '<span class="natal-chart-sign-symbol">' . $this->get_zodiac_symbol($house['sign']) . '</span>';
+                $html .= '<span class="natal-chart-sign-name">' . esc_html($house['sign']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            if (isset($house['longitude'])) {
+                $html .= '<div class="natal-chart-house-longitude">';
+                $html .= '<span class="natal-chart-longitude-label">' . __('Position', 'natal-chart-plugin') . ':</span> ';
+                $html .= '<span class="natal-chart-longitude-value">' . $this->format_longitude($house['longitude']) . '</span>';
+                $html .= '</div>';
+            }
+            
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div></div>';
+        return $html;
+    }
+
+    /**
+     * Format aspects section
+     * 
+     * @param array $aspects Aspects data
+     * @return string Formatted HTML
+     */
+    private function format_aspects_section($aspects) {
+        $html = '<div class="natal-chart-section">';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('Major Aspects', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-aspects-table">';
+        $html .= '<table class="natal-chart-table">';
+        $html .= '<thead><tr>';
+        $html .= '<th class="natal-chart-table-header">' . __('Planet 1', 'natal-chart-plugin') . '</th>';
+        $html .= '<th class="natal-chart-table-header">' . __('Aspect', 'natal-chart-plugin') . '</th>';
+        $html .= '<th class="natal-chart-table-header">' . __('Planet 2', 'natal-chart-plugin') . '</th>';
+        $html .= '<th class="natal-chart-table-header">' . __('Orb', 'natal-chart-plugin') . '</th>';
+        $html .= '</tr></thead><tbody>';
+        
+        foreach ($aspects as $aspect) {
+            $html .= '<tr class="natal-chart-aspect-row natal-chart-aspect-' . strtolower($aspect['aspect'] ?? '') . '">';
+            $html .= '<td data-label="' . __('Planet 1', 'natal-chart-plugin') . '">' . esc_html($aspect['planet1'] ?? '') . '</td>';
+            $html .= '<td data-label="' . __('Aspect', 'natal-chart-plugin') . '"><span class="natal-chart-aspect-type">' . $this->get_aspect_symbol($aspect['aspect'] ?? '') . ' ' . esc_html($aspect['aspect'] ?? '') . '</span></td>';
+            $html .= '<td data-label="' . __('Planet 2', 'natal-chart-plugin') . '">' . esc_html($aspect['planet2'] ?? '') . '</td>';
+            $html .= '<td data-label="' . __('Orb', 'natal-chart-plugin') . '">' . esc_html($aspect['orb'] ?? '') . '°</td>';
+            $html .= '</tr>';
+        }
+        
+        $html .= '</tbody></table></div>';
+        $html .= '</div></div>';
+        return $html;
+    }
+
+    /**
+     * Format angles section
+     * 
+     * @param array $angles Angles data
+     * @return string Formatted HTML
+     */
+    private function format_angles_section($angles) {
+        $html = '<div class="natal-chart-section">';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('Angular Points', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-angles-grid">';
+        
+        $angle_types = [
+            'asc' => __('Ascendant', 'natal-chart-plugin'),
+            'mc' => __('Midheaven', 'natal-chart-plugin'),
+            'desc' => __('Descendant', 'natal-chart-plugin'),
+            'ic' => __('Imum Coeli', 'natal-chart-plugin')
+        ];
+        
+        foreach ($angle_types as $key => $label) {
+            if (isset($angles[$key])) {
+                $angle = $angles[$key];
+                $html .= '<div class="natal-chart-angle-item">';
+                $html .= '<div class="natal-chart-angle-name">' . $label . '</div>';
+                $html .= '<div class="natal-chart-angle-details">';
+                $html .= '<span class="natal-chart-angle-sign">' . esc_html($angle['sign'] ?? '') . '</span>';
+                if (isset($angle['degree'])) {
+                    $html .= '<span class="natal-chart-angle-degree">' . esc_html($angle['degree']) . '°</span>';
+                }
+                $html .= '</div></div>';
+            }
+        }
+        
+        $html .= '</div>';
+        $html .= '</div></div>';
+        return $html;
+    }
+
+    /**
+     * Format lunar nodes section
+     * 
+     * @param array $nodes Lunar nodes data
+     * @return string Formatted HTML
+     */
+    private function format_lunar_nodes_section($nodes) {
+        $html = '<div class="natal-chart-section">';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('Lunar Nodes', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-nodes-grid">';
+        
+        if (isset($nodes['north'])) {
+            $html .= '<div class="natal-chart-node-item">';
+            $html .= '<div class="natal-chart-node-name">' . __('North Node', 'natal-chart-plugin') . '</div>';
+            $html .= '<div class="natal-chart-node-details">';
+            $html .= '<span class="natal-chart-node-sign">' . esc_html($nodes['north']['sign'] ?? '') . '</span>';
+            if (isset($nodes['north']['degree'])) {
+                $html .= '<span class="natal-chart-node-degree">' . esc_html($nodes['north']['degree']) . '°</span>';
+            }
+            $html .= '</div></div>';
+        }
+        
+        if (isset($nodes['south'])) {
+            $html .= '<div class="natal-chart-node-item">';
+            $html .= '<div class="natal-chart-node-name">' . __('South Node', 'natal-chart-plugin') . '</div>';
+            $html .= '<div class="natal-chart-node-details">';
+            $html .= '<span class="natal-chart-node-sign">' . esc_html($nodes['south']['sign'] ?? '') . '</span>';
+            if (isset($nodes['south']['degree'])) {
+                $html .= '<span class="natal-chart-node-degree">' . esc_html($nodes['south']['degree']) . '°</span>';
+            }
+            $html .= '</div></div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div></div>';
+        return $html;
+    }
+
+    /**
+     * Format nested data structure
+     * 
+     * @param array $data Nested data
+     * @return string Formatted HTML
+     */
+    private function format_nested_data($data) {
+        $html = '';
+        
+        if (isset($data['chart'])) {
+            $html .= $this->format_astrological_data($data['chart']);
+        } elseif (isset($data['data'])) {
+            $html .= $this->format_astrological_data($data['data']);
+        } else {
+            $html .= $this->format_generic_data($data);
+        }
+        
+        return $html;
+    }
+
+    /**
+     * Format generic data structure
+     * 
+     * @param array $data Generic data
+     * @return string Formatted HTML
+     */
+    private function format_generic_data($data) {
+        $html = '<div class="natal-chart-generic-data">';
+        $html .= '<div class="natal-chart-data-summary">';
+        $html .= '<p>' . __('Chart data received successfully. The data contains:', 'natal-chart-plugin') . '</p>';
+        $html .= '<ul class="natal-chart-data-keys">';
+        
+        foreach (array_keys($data) as $key) {
+            $html .= '<li><strong>' . esc_html(ucfirst(str_replace('_', ' ', $key))) . ':</strong> ';
+            if (is_array($data[$key])) {
+                $html .= count($data[$key]) . ' ' . __('items', 'natal-chart-plugin');
+            } else {
+                $html .= esc_html($data[$key]);
+            }
+            $html .= '</li>';
+        }
+        
+        $html .= '</ul></div>';
+        
+        // Show raw data in collapsible section for developers
+        $html .= '<details class="natal-chart-raw-data">';
+        $html .= '<summary>' . __('View Raw Data (for developers)', 'natal-chart-plugin') . '</summary>';
+        $html .= '<pre class="natal-chart-json-data">' . esc_html(json_encode($data, JSON_PRETTY_PRINT)) . '</pre>';
+        $html .= '</details>';
+        
+        $html .= '</div>';
+        return $html;
+    }
+
+    /**
+     * Get zodiac symbol
+     * 
+     * @param string $sign_name Sign name
+     * @return string Zodiac symbol
+     */
+    private function get_zodiac_symbol($sign_name) {
+        $symbols = [
+            'aries' => '♈',
+            'taurus' => '♉',
+            'gemini' => '♊',
+            'cancer' => '♋',
+            'leo' => '♌',
+            'virgo' => '♍',
+            'libra' => '♎',
+            'scorpio' => '♏',
+            'sagittarius' => '♐',
+            'capricorn' => '♑',
+            'aquarius' => '♒',
+            'pisces' => '♓'
+        ];
+        
+        $key = strtolower(trim($sign_name));
+        return isset($symbols[$key]) ? $symbols[$key] : '';
+    }
+
+    /**
+     * Get house name
+     * 
+     * @param string $house_number House number
+     * @return string House name
+     */
+    private function get_house_name($house_number) {
+        $names = [
+            '1' => __('1st House - Self & Identity', 'natal-chart-plugin'),
+            '2' => __('2nd House - Values & Resources', 'natal-chart-plugin'),
+            '3' => __('3rd House - Communication & Siblings', 'natal-chart-plugin'),
+            '4' => __('4th House - Home & Family', 'natal-chart-plugin'),
+            '5' => __('5th House - Creativity & Romance', 'natal-chart-plugin'),
+            '6' => __('6th House - Work & Health', 'natal-chart-plugin'),
+            '7' => __('7th House - Partnerships', 'natal-chart-plugin'),
+            '8' => __('8th House - Transformation & Shared Resources', 'natal-chart-plugin'),
+            '9' => __('9th House - Philosophy & Higher Learning', 'natal-chart-plugin'),
+            '10' => __('10th House - Career & Public Image', 'natal-chart-plugin'),
+            '11' => __('11th House - Friends & Groups', 'natal-chart-plugin'),
+            '12' => __('12th House - Spirituality & Hidden Matters', 'natal-chart-plugin')
+        ];
+        
+        return isset($names[$house_number]) ? $names[$house_number] : $house_number;
+    }
+
+    /**
+     * Get aspect symbol
+     * 
+     * @param string $aspect_type Aspect type
+     * @return string Aspect symbol
+     */
+    private function get_aspect_symbol($aspect_type) {
+        $symbols = [
+            'conjunction' => '☌',
+            'opposition' => '☍',
+            'trine' => '△',
+            'square' => '□',
+            'sextile' => '⚹',
+            'quincunx' => '⚻',
+            'semi-square' => '∠',
+            'sesquiquadrate' => '⚼'
+        ];
+        
+        $key = strtolower(trim($aspect_type));
+        return isset($symbols[$key]) ? $symbols[$key] : '';
     }
     
     /**
@@ -479,5 +888,98 @@ class Natal_Chart_Form {
             return esc_html($errors[$field_name]);
         }
         return '';
+    }
+
+    /**
+     * Format longitude to user-friendly format
+     * 
+     * @param string $longitude Longitude string (e.g., "22 Sco 33' 44\"")
+     * @return string Formatted longitude (e.g., "22° 33' 44\"")
+     */
+    private function format_longitude($longitude) {
+        // Remove zodiac sign and format as degrees, minutes, seconds
+        $longitude = trim($longitude);
+        
+        // Extract degrees, minutes, seconds from format like "22 Sco 33' 44\""
+        if (preg_match('/(\d+)\s+[A-Za-z]+\s+(\d+)\'?\s*(\d+)\"?/', $longitude, $matches)) {
+            $degrees = $matches[1];
+            $minutes = $matches[2];
+            $seconds = $matches[3];
+            
+            return $degrees . '° ' . $minutes . "' " . $seconds . '"';
+        }
+        
+        // If it's already in a different format, try to extract just the numbers
+        if (preg_match('/(\d+)\s*[°\s]*(\d+)\s*[\'\s]*(\d+)\s*["\s]*/', $longitude, $matches)) {
+            $degrees = $matches[1];
+            $minutes = $matches[2];
+            $seconds = $matches[3];
+            
+            return $degrees . '° ' . $minutes . "' " . $seconds . '"';
+        }
+        
+        // Fallback: return as is if we can't parse it
+        return esc_html($longitude);
+    }
+
+    /**
+     * Format planet longitude to user-friendly format
+     * 
+     * @param string $longitude Longitude string (e.g., "29 Pis 00' 30\"")
+     * @return string Formatted longitude (e.g., "29° 00' 30\"")
+     */
+    private function format_planet_longitude($longitude) {
+        // Extract degrees, minutes, seconds from format like "29 Pis 00' 30\""
+        if (preg_match('/(\d+)\s+[A-Za-z]+\s+(\d+)\'?\s*(\d+)\"?/', $longitude, $matches)) {
+            $degrees = $matches[1];
+            $minutes = $matches[2];
+            $seconds = $matches[3];
+            
+            return $degrees . '° ' . $minutes . "' " . $seconds . '"';
+        }
+        
+        // If it's already in a different format, try to extract just the numbers
+        if (preg_match('/(\d+)\s*[°\s]*(\d+)\s*[\'\s]*(\d+)\s*["\s]*/', $longitude, $matches)) {
+            $degrees = $matches[1];
+            $minutes = $matches[2];
+            $seconds = $matches[3];
+            
+            return $degrees . '° ' . $minutes . "' " . $seconds . '"';
+        }
+        
+        // Fallback: return as is if we can't parse it
+        return esc_html($longitude);
+    }
+
+    /**
+     * Get planet symbol
+     * 
+     * @param string $planet_name Planet name
+     * @return string Planet symbol
+     */
+    private function get_planet_symbol($planet_name) {
+        $symbols = [
+            'sun' => '☉',
+            'moon' => '☽',
+            'mercury' => '☿',
+            'venus' => '♀',
+            'mars' => '♂',
+            'jupiter' => '♃',
+            'saturn' => '♄',
+            'uranus' => '♅',
+            'neptune' => '♆',
+            'pluto' => '♇',
+            'chiron' => '⚷',
+            'lilith' => '⚸',
+            'node' => '☊',
+            'north node' => '☊',
+            'south node' => '☋',
+            'p. of fortune' => '⊗',
+            'part of fortune' => '⊗',
+            'vertex' => '⚸'
+        ];
+        
+        $key = strtolower(trim($planet_name));
+        return isset($symbols[$key]) ? $symbols[$key] : '';
     }
 }
