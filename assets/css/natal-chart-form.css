@@ -1222,3 +1222,88 @@
     transform: scale(1.02);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
+
+/* Form Disabled State */
+.natal-chart-form-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+    display: none !important; /* Force hide the form */
+}
+
+.natal-chart-form-disabled::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    border-radius: 12px;
+}
+
+/* Specific form targeting */
+#natal_chart_form.natal_chart_form.natal-chart-form-disabled {
+    display: none !important;
+}
+
+#natal_chart_form.natal_chart_form[style*="display: none"] {
+    display: none !important;
+}
+
+/* Target the specific form class */
+.natal_chart_form.natal-chart-form-disabled {
+    display: none !important;
+}
+
+.natal-chart-form-disabled .natal-chart-form-submit {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.natal-chart-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    border-color: #dee2e6 !important;
+}
+
+.natal-chart-disabled:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Disabled form inputs specific styling */
+.natal-chart-form-disabled input.natal-chart-disabled,
+.natal-chart-form-disabled select.natal-chart-disabled {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    border-color: #dee2e6 !important;
+    cursor: not-allowed;
+}
+
+.natal-chart-form-disabled .natal-chart-time-input-group {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+}
+
+.natal-chart-form-disabled .natal-chart-time-input,
+.natal-chart-form-disabled .natal-chart-ampm-select {
+    background-color: transparent !important;
+    color: #6c757d !important;
+    cursor: not-allowed;
+}
+
+/* Disabled location search */
+.natal-chart-form-disabled .natal-chart-location-search {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    cursor: not-allowed;
+}
+
+.natal-chart-form-disabled .natal-chart-location-search:focus {
+    border-color: #dee2e6 !important;
+    box-shadow: none !important;
+}

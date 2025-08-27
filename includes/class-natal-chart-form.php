@@ -370,9 +370,6 @@ class Natal_Chart_Form {
     public function render_results($chart_data, $form_data) {
         ob_start();
         ?>
-        <div class="natal-chart-results-header">
-            <h3><?php _e('Your Natal Chart Results', 'natal-chart-plugin'); ?></h3>
-        </div>
         <div class="natal-chart-results-content">
             <div class="natal-chart-personal-info">
                 <h4><?php _e('Personal Information', 'natal-chart-plugin'); ?></h4>
@@ -424,7 +421,7 @@ class Natal_Chart_Form {
             </div>
             
             <div class="natal-chart-actions">
-                <button type="button" class="button button-primary" onclick="location.reload()">
+                <button type="button" class="button button-primary" onclick="enableFormAndRefresh()">
                     <?php _e('Generate New Chart', 'natal-chart-plugin'); ?>
                 </button>
             </div>

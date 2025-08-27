@@ -388,6 +388,8 @@ class NatalChartForm {
             
             this.showSuccessMessage(response.data.message || 'Natal chart generated successfully!');
             
+            document.getElementById('natal_chart_form').style.display='none';
+
             // Display results directly in the form's results container
             console.log('Calling displayResults...');
             this.displayResults(response.data.results_html);
@@ -812,6 +814,72 @@ class NatalChartForm {
         
         return isValid;
     }
+
+    /**
+     * Disable the form when results are shown
+     */
+    disableForm() {
+        // Target the specific form by ID and CSS class
+        const form = document.querySelector('#natal_chart_form.natal_chart_form');
+        if (form) {
+            // Hide the form when results are shown
+            form.style.display = 'none';
+            
+            // Disable all form inputs
+            const inputs = form.querySelectorAll('input, select, button:not([onclick*="enableFormAndRefresh"])');
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.classList.add('natal-chart-disabled');
+            });
+            
+            // Disable the submit button
+            const submitButton = this.submitButton;
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.classList.add('natal-chart-disabled');
+            }
+            
+            // Add visual indication that form is disabled
+            form.classList.add('natal-chart-form-disabled');
+            
+            console.log('✅ Form with ID "natal_chart_form" and class "natal_chart_form" disabled and hidden successfully');
+        } else {
+            console.error('❌ Form with ID "natal_chart_form" and class "natal_chart_form" not found!');
+        }
+    }
+
+    /**
+     * Re-enable the form when starting fresh
+     */
+    enableForm() {
+        // Target the specific form by ID and CSS class
+        const form = document.querySelector('#natal_chart_form.natal_chart_form');
+        if (form) {
+            // Show the form again
+            form.style.display = 'block';
+            
+            // Enable all form inputs
+            const inputs = form.querySelectorAll('input, select, button');
+            inputs.forEach(input => {
+                input.disabled = false;
+                input.classList.remove('natal-chart-disabled');
+            });
+            
+            // Enable the submit button
+            const submitButton = this.submitButton;
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.classList.remove('natal-chart-disabled');
+            }
+            
+            // Remove visual indication that form is disabled
+            form.classList.remove('natal-chart-form-disabled');
+            
+            console.log('✅ Form with ID "natal_chart_form" and class "natal_chart_form" enabled and shown successfully');
+        } else {
+            console.error('❌ Form with ID "natal_chart_form" and class "natal_chart_form" not found!');
+        }
+    }
 }
 
 // Minimal test function for basic validation logic
@@ -915,6 +983,21 @@ window.simpleFormTest = function() {
     } else {
         console.log('Cannot run validation - method not available');
     }
+};
+
+// Global function to enable form and refresh page
+window.enableFormAndRefresh = function() {
+    console.log('=== ENABLING FORM AND REFRESHING PAGE ===');
+    
+    // Re-enable and show the form if it exists
+    if (window.natalChartForm) {
+        window.natalChartForm.enableForm();
+    }
+    
+    // Refresh the page after a short delay to ensure form is visible
+    setTimeout(() => {
+        location.reload();
+    }, 200);
 };
 
 // Global function to manually initialize the form (can be called from shortcode)
