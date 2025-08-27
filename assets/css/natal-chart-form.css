@@ -382,6 +382,407 @@
     white-space: pre-wrap;
 }
 
+/* Astrological Data Sections */
+.natal-chart-astrological-data {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.natal-chart-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e1e8ed;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.natal-chart-section-title {
+    color: #2c3e50;
+    margin: 0 0 20px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Houses Section */
+.natal-chart-houses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.natal-chart-house-item {
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #c3e6cb;
+    transition: all 0.3s ease;
+}
+
+.natal-chart-house-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #28a745;
+}
+
+.natal-chart-house-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.natal-chart-house-number {
+    background: #28a745;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.natal-chart-house-name {
+    color: #155724;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+.natal-chart-house-sign {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.natal-chart-sign-symbol {
+    font-size: 20px;
+    color: #6f42c1;
+}
+
+.natal-chart-sign-name {
+    color: #495057;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.natal-chart-house-longitude {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(108, 117, 125, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #6c757d;
+}
+
+.natal-chart-longitude-label {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 60px;
+}
+
+.natal-chart-longitude-value {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.natal-chart-sign-degree {
+    background: #6f42c1;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* Aspects Section */
+.natal-chart-aspects-table {
+    overflow-x: auto;
+}
+
+.natal-chart-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.natal-chart-table-header {
+    background: #667eea;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    position: relative;
+}
+
+.natal-chart-table-header:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.natal-chart-table th {
+    background: #667eea;
+    color: white;
+    padding: 12px 15px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.natal-chart-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.natal-chart-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.natal-chart-aspect-type {
+    background: #394b59;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.natal-chart-aspect-type::before {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+
+/* Angles Section */
+.natal-chart-angles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.natal-chart-angle-item {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #ffeaa7;
+    transition: all 0.3s ease;
+}
+
+.natal-chart-angle-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #f39c12;
+}
+
+.natal-chart-angle-name {
+    color: #856404;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.natal-chart-angle-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.natal-chart-angle-sign {
+    background: #f39c12;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.natal-chart-angle-degree {
+    background: #e67e22;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* Lunar Nodes Section */
+.natal-chart-nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.natal-chart-node-item {
+    background: linear-gradient(135deg, #e8f4fd 0%, #d1ecf1 100%);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #bee5eb;
+    transition: all 0.3s ease;
+}
+
+.natal-chart-node-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #17a2b8;
+}
+
+.natal-chart-node-name {
+    color: #0c5460;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.natal-chart-node-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.natal-chart-node-sign {
+    background: #17a2b8;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.natal-chart-node-degree {
+    background: #138496;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* Generic Data Section */
+.natal-chart-generic-data {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e1e8ed;
+}
+
+.natal-chart-data-summary {
+    margin-bottom: 20px;
+}
+
+.natal-chart-data-summary p {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.natal-chart-data-keys {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.natal-chart-data-keys li {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+    color: #495057;
+}
+
+.natal-chart-data-keys li strong {
+    color: #2c3e50;
+}
+
+/* Raw Data Section */
+.natal-chart-raw-data {
+    margin-top: 20px;
+}
+
+.natal-chart-raw-data summary {
+    background: #6c757d;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    user-select: none;
+    transition: background-color 0.3s ease;
+}
+
+.natal-chart-raw-data summary:hover {
+    background: #5a6268;
+}
+
+.natal-chart-raw-data summary::-webkit-details-marker {
+    display: none;
+}
+
+.natal-chart-raw-data summary::after {
+    content: '▼';
+    float: right;
+    transition: transform 0.3s ease;
+}
+
+.natal-chart-raw-data[open] summary::after {
+    transform: rotate(180deg);
+}
+
+/* Nested Data Section - Removed wrapper */
+.natal-chart-nested-data {
+    /* Removed wrapper styles */
+}
+
 /* Action Buttons */
 .natal-chart-actions {
     display: flex;
@@ -670,4 +1071,163 @@
     .natal-chart-time-separator {
         font-size: 16px;
     }
+}
+
+/* Responsive Design for Astrological Data */
+@media (max-width: 768px) {
+    .natal-chart-houses-grid,
+    .natal-chart-angles-grid,
+    .natal-chart-nodes-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .natal-chart-section {
+        padding: 15px;
+    }
+    
+    .natal-chart-house-item,
+    .natal-chart-angle-item,
+    .natal-chart-node-item {
+        padding: 12px;
+    }
+    
+    .natal-chart-table {
+        font-size: 13px;
+    }
+    
+    .natal-chart-table th,
+    .natal-chart-table td {
+        padding: 8px 10px;
+    }
+    
+    .natal-chart-aspect-type {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-width: 100px;
+        gap: 6px;
+    }
+    
+    .natal-chart-aspect-type::before {
+        font-size: 16px;
+    }
+    
+    .natal-chart-table-header {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .natal-chart-house-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .natal-chart-house-sign,
+    .natal-chart-angle-details,
+    .natal-chart-node-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .natal-chart-section-title {
+        font-size: 1rem;
+    }
+    
+    .natal-chart-table {
+        font-size: 12px;
+    }
+    
+    .natal-chart-table th,
+    .natal-chart-table td {
+        padding: 6px 8px;
+    }
+    
+    .natal-chart-aspect-type {
+        padding: 4px 8px;
+        font-size: 11px;
+        min-width: 80px;
+        gap: 4px;
+    }
+    
+    .natal-chart-aspect-type::before {
+        font-size: 14px;
+    }
+    
+    .natal-chart-table-header {
+        padding: 10px 12px;
+        font-size: 12px;
+        letter-spacing: 0.3px;
+    }
+    
+    /* Stack table on very small screens */
+    .natal-chart-aspects-table {
+        overflow-x: visible;
+    }
+    
+    .natal-chart-table {
+        display: block;
+        width: 100%;
+    }
+    
+    .natal-chart-table thead {
+        display: none;
+    }
+    
+    .natal-chart-table tbody {
+        display: block;
+        width: 100%;
+    }
+    
+    .natal-chart-table tr {
+        display: block;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .natal-chart-table td {
+        display: block;
+        text-align: left;
+        padding: 8px 0;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .natal-chart-table td:last-child {
+        border-bottom: none;
+    }
+    
+    .natal-chart-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #2c3e50;
+        margin-right: 10px;
+        min-width: 80px;
+        display: inline-block;
+    }
+}
+
+/* Chart Image Section */
+.natal-chart-image-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.natal-chart-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e1e8ed;
+    transition: all 0.3s ease;
+}
+
+.natal-chart-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
