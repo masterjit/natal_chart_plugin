@@ -129,27 +129,93 @@ class Natal_Chart_Form {
                         <?php _e('Birth Time', 'natal-chart-plugin'); ?> <span class="required">*</span>
                     </label>
                     <div class="natal-chart-time-input-group">
-                        <input type="number" 
-                               id="natal_chart_birth_hour" 
-                               name="natal_chart_birth_hour" 
-                               class="natal-chart-form-input natal-chart-time-input" 
-                               min="1" 
-                               max="12" 
-                               placeholder="12" 
-                               required />
+                        <select id="natal_chart_birth_hour" 
+                                name="natal_chart_birth_hour" 
+                                class="natal-chart-form-input natal-chart-time-input" 
+                                required>
+                            <option value="12" selected>12</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                        </select>
                         <span class="natal-chart-time-separator">:</span>
-                        <input type="number" 
-                               id="natal_chart_birth_minute" 
-                               name="natal_chart_birth_minute" 
-                               class="natal-chart-form-input natal-chart-time-input" 
-                               min="0" 
-                               max="59" 
-                               placeholder="00" 
-                               required />
+                        <select id="natal_chart_birth_minute" 
+                                name="natal_chart_birth_minute" 
+                                class="natal-chart-form-input natal-chart-time-input" 
+                                required>
+                            <option value="00" selected>00</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option>
+                            <option value="26">26</option>
+                            <option value="27">27</option>
+                            <option value="28">28</option>
+                            <option value="29">29</option>
+                            <option value="30">30</option>
+                            <option value="31">31</option>
+                            <option value="32">32</option>
+                            <option value="33">33</option>
+                            <option value="34">34</option>
+                            <option value="35">35</option>
+                            <option value="36">36</option>
+                            <option value="37">37</option>
+                            <option value="38">38</option>
+                            <option value="39">39</option>
+                            <option value="40">40</option>
+                            <option value="41">41</option>
+                            <option value="42">42</option>
+                            <option value="43">43</option>
+                            <option value="44">44</option>
+                            <option value="45">45</option>
+                            <option value="46">46</option>
+                            <option value="47">47</option>
+                            <option value="48">48</option>
+                            <option value="49">49</option>
+                            <option value="50">50</option>
+                            <option value="51">51</option>
+                            <option value="52">52</option>
+                            <option value="53">53</option>
+                            <option value="54">54</option>
+                            <option value="55">55</option>
+                            <option value="56">56</option>
+                            <option value="57">57</option>
+                            <option value="58">58</option>
+                            <option value="59">59</option>
+                        </select>
                         <select id="natal_chart_birth_ampm" 
                                 name="natal_chart_birth_ampm" 
                                 class="natal-chart-form-input natal-chart-ampm-select">
-                            <option value="AM">AM</option>
+                            <option value="AM" selected>AM</option>
                             <option value="PM">PM</option>
                         </select>
                     </div>
@@ -477,9 +543,24 @@ class Natal_Chart_Form {
             $html .= $this->format_houses_section($data['houses']);
         }
         
-        // Aspects Section
+        // Aspects Section (Major Aspects)
         if (isset($data['aspects']) && is_array($data['aspects'])) {
             $html .= $this->format_aspects_section($data['aspects']);
+        }
+        
+        // Planetary Aspects Section (Detailed Interpretations)
+        if (isset($data['interpretations']['planetary_aspects']) && is_array($data['interpretations']['planetary_aspects'])) {
+            $html .= $this->format_planetary_aspects_section($data['interpretations']['planetary_aspects']);
+        }
+        
+        // Planets Section (Detailed Interpretations)
+        if (isset($data['interpretations']['planets']) && is_array($data['interpretations']['planets'])) {
+            $html .= $this->format_planets_interpretations_section($data['interpretations']['planets']);
+        }
+        
+        // Houses Section (Detailed Interpretations)
+        if (isset($data['interpretations']['houses']) && is_array($data['interpretations']['houses'])) {
+            $html .= $this->format_houses_interpretations_section($data['interpretations']['houses']);
         }
         
         // Additional astrological data
@@ -584,11 +665,11 @@ class Natal_Chart_Form {
      * @return string Formatted HTML
      */
     private function format_houses_section($houses) {
-        $html = '<div class="natal-chart-section">';
-        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html = '<div class="natal-chart-section natal-chart-houses">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
         $html .= '<span>' . __('House Cusps', 'natal-chart-plugin') . '</span>';
         $html .= '</div>';
-        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
         $html .= '<div class="natal-chart-houses-grid">';
         
         foreach ($houses as $house) {
@@ -626,11 +707,11 @@ class Natal_Chart_Form {
      * @return string Formatted HTML
      */
     private function format_aspects_section($aspects) {
-        $html = '<div class="natal-chart-section">';
-        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html = '<div class="natal-chart-section natal-chart-aspects">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
         $html .= '<span>' . __('Major Aspects', 'natal-chart-plugin') . '</span>';
         $html .= '</div>';
-        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
         $html .= '<div class="natal-chart-aspects-table">';
         $html .= '<table class="natal-chart-table">';
         $html .= '<thead><tr>';
@@ -651,6 +732,264 @@ class Natal_Chart_Form {
         
         $html .= '</tbody></table></div>';
         $html .= '</div></div>';
+        return $html;
+    }
+
+    /**
+     * Format planetary aspects section
+     * 
+     * @param array $planetary_aspects Planetary aspects data
+     * @return string Formatted HTML
+     */
+    private function format_planetary_aspects_section($planetary_aspects) {
+        if (empty($planetary_aspects) || !isset($planetary_aspects['aspects']) || !is_array($planetary_aspects['aspects'])) {
+            return '<div style="background: #ffebee; padding: 10px; margin: 10px 0; border: 1px solid #f44336; color: #c62828;">Debug: No planetary aspects data found. Data: ' . print_r($planetary_aspects, true) . '</div>';
+        }
+
+        $html = '<div class="natal-chart-section natal-chart-planetary-aspects">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('PLANETARY ASPECTS', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
+        
+        // Header description
+        if (!empty($planetary_aspects['header'])) {
+            $html .= '<div class="natal-chart-section-description">';
+            $html .= wp_kses_post(nl2br($planetary_aspects['header']));
+            $html .= '</div>';
+        }
+        
+        $html .= '<div class="natal-chart-planetary-aspects-list">';
+        
+        foreach ($planetary_aspects['aspects'] as $aspect) {
+            $html .= '<div class="natal-chart-planetary-aspect-item natal-chart-planetary-aspect-' . strtolower($aspect['aspect'] ?? '') . '">';
+            
+            // Header section with Planet 1, Aspect, Planet 2, and Orb
+            $html .= '<div class="natal-chart-planetary-aspect-header">';
+            $html .= '<div class="natal-chart-planetary-aspect-planets">';
+            $html .= '<span class="natal-chart-planet1">' . esc_html($aspect['planet1'] ?? '') . '</span>';
+            $html .= '<span class="natal-chart-aspect-symbol">' . $this->get_aspect_symbol($aspect['aspect'] ?? '') . '</span>';
+            $html .= '<span class="natal-chart-planet2">' . esc_html($aspect['planet2'] ?? '') . '</span>';
+            if (isset($aspect['orb'])) {
+                $html .= '<span class="natal-chart-aspect-orb-inline"> (Orb: ' . number_format($aspect['orb'], 2) . '°)</span>';
+            }
+            $html .= '</div>';
+            $html .= '</div>';
+            
+            // Content section with Interpretation
+            $html .= '<div class="natal-chart-planetary-aspect-content">';
+            
+            // Interpretation with continuation logic
+            $interpretation = $aspect['interpretation'] ?? '';
+            if (!empty($interpretation)) {
+                // Show first 300 characters initially (longer preview)
+                $initial_length = 300;
+                $initial_content = substr($interpretation, 0, $initial_length);
+                $remaining_content = substr($interpretation, $initial_length);
+                
+                $html .= '<div class="natal-chart-interpretation">';
+                $html .= wp_kses_post($initial_content);
+                
+                // If there's remaining content, add it in a hidden div
+                if (!empty($remaining_content)) {
+                    $html .= '<span class="natal-chart-triple-dots">...</span>'; // Add triple dots to indicate more content
+                    $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
+                    $html .= wp_kses_post($remaining_content);
+                    $html .= '</span>';
+                    
+                    $html .= '<div class="natal-chart-interpretation-toggle">';
+                    $html .= '<button type="button" class="natal-chart-show-more" onclick="toggleInterpretation(this)">';
+                    $html .= __('Show More', 'natal-chart-plugin');
+                    $html .= '</button>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div>';
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
+        return $html;
+    }
+
+    /**
+     * Format planets interpretations section
+     * 
+     * @param array $planets_interpretations Planets interpretations data
+     * @return string Formatted HTML
+     */
+    private function format_planets_interpretations_section($planets_interpretations) {
+        if (empty($planets_interpretations) || !is_array($planets_interpretations)) {
+            return '';
+        }
+
+        $html = '<div class="natal-chart-section natal-chart-planets-interpretations">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('PLANETS INTERPRETATIONS', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
+       
+        
+        // Header description
+        if (!empty($planets_interpretations['header'])) {
+            $html .= '<div class="natal-chart-section-description">';
+            $html .= wp_kses_post(nl2br($planets_interpretations['header']));
+            $html .= '</div>';
+        }
+        
+        $html .= '<div class="natal-chart-planets-interpretations-list">';
+        
+        foreach ($planets_interpretations as $planet_name => $planet_data) {
+            // Skip if it's not a planet or doesn't have sign data
+            if ($planet_name === 'header' || !isset($planet_data['sign'])) {
+                continue;
+            }
+            
+            $html .= '<div class="natal-chart-planet-interpretation-item">';           
+            
+            // Content section with Interpretation
+            $html .= '<div class="natal-chart-planet-interpretation-content">';
+            
+            // Interpretation with continuation logic
+            $interpretation = $planet_data['sign'] ?? '';
+            if (!empty($interpretation)) {
+                // Show first 300 characters initially (longer preview)
+                $initial_length = 300;
+                $initial_content = substr($interpretation, 0, $initial_length);
+                $remaining_content = substr($interpretation, $initial_length);
+                
+                $html .= '<div class="natal-chart-interpretation">';
+                $html .= wp_kses_post($initial_content);
+                
+                // If there's remaining content, add it in a hidden div
+                if (!empty($remaining_content)) {
+                    $html .= '<span class="natal-chart-triple-dots">...</span>'; // Add triple dots to indicate more content
+                    $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
+                    $html .= wp_kses_post($remaining_content);
+                    $html .= '</span>';
+                    
+                    $html .= '<div class="natal-chart-interpretation-toggle">';
+                    $html .= '<button type="button" class="natal-chart-show-more" onclick="toggleInterpretation(this)">';
+                    $html .= __('Show More', 'natal-chart-plugin');
+                    $html .= '</button>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div>';
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
+        return $html;
+    }
+
+    /**
+     * Format houses interpretations section
+     * 
+     * @param array $houses_interpretations Houses interpretations data
+     * @return string Formatted HTML
+     */
+    private function format_houses_interpretations_section($houses_interpretations) {
+        if (empty($houses_interpretations) || !is_array($houses_interpretations)) {
+            return '';
+        }
+
+        $html = '<div class="natal-chart-section natal-chart-houses-interpretations">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('HOUSE INTERPRETATIONS', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
+        
+        // Header description
+        if (!empty($houses_interpretations['header'])) {
+            $html .= '<div class="natal-chart-section-description">';
+            $html .= wp_kses_post(nl2br($houses_interpretations['header']));
+            $html .= '</div>';
+        }
+        
+        $html .= '<div class="natal-chart-houses-interpretations-list">';
+        
+        foreach ($houses_interpretations as $house_key => $house_data) {
+            // Skip if it's not a house or doesn't have planet data
+            if ($house_key === 'header' || !is_array($house_data)) {
+                continue;
+            }
+            
+            // Extract house number from key (e.g., "house_4" -> "4th House")
+            $house_number = str_replace('house_', '', $house_key);
+            $house_label = $this->get_house_label($house_number);
+            
+            $html .= '<div class="natal-chart-house-interpretation-item">';
+            
+            // Header section with House Number
+            $html .= '<div class="natal-chart-house-interpretation-header">';
+            $html .= '<span class="natal-chart-house-number">' . esc_html($house_label) . '</span>';
+            $html .= '</div>';
+            
+            // Content section with Planet Interpretations
+            $html .= '<div class="natal-chart-house-interpretation-content">';
+            
+            foreach ($house_data as $planet_data) {
+                $planet_name = $planet_data['planet'] ?? '';
+                $interpretation = $planet_data['interpretation'] ?? '';
+                
+                if (!empty($planet_name) && !empty($interpretation)) {
+                    $html .= '<div class="natal-chart-house-planet-item">';
+                    $html .= '<div class="natal-chart-house-planet-header">';
+                    $html .= '<span class="natal-chart-planet-symbol">' . $this->get_planet_symbol($planet_name) . '</span>';
+                    $html .= '<span class="natal-chart-planet-name">' . esc_html($planet_name) . '</span>';
+                    $html .= '</div>';
+                    
+                    // Interpretation with continuation logic
+                    $initial_length = 300;
+                    $initial_content = substr($interpretation, 0, $initial_length);
+                    $remaining_content = substr($interpretation, $initial_length);
+                    
+                    $html .= '<div class="natal-chart-interpretation">';
+                    $html .= wp_kses_post($initial_content);
+                    
+                    // If there's remaining content, add it in a hidden div
+                    if (!empty($remaining_content)) {
+                        $html .= '<span class="natal-chart-triple-dots">...</span>';
+                        $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
+                        $html .= wp_kses_post($remaining_content);
+                        $html .= '</span>';
+                        
+                        $html .= '<div class="natal-chart-interpretation-toggle">';
+                        $html .= '<button type="button" class="natal-chart-show-more" onclick="toggleInterpretation(this)">';
+                        $html .= __('Show More', 'natal-chart-plugin');
+                        $html .= '</button>';
+                        $html .= '</div>';
+                    }
+                    
+                    $html .= '</div>';
+                    $html .= '</div>';
+                }
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
         return $html;
     }
 
@@ -841,6 +1180,30 @@ class Natal_Chart_Form {
     }
 
     /**
+     * Get house label (e.g., "1st House" -> "1st House")
+     * 
+     * @param string $house_number House number
+     * @return string House label
+     */
+    private function get_house_label($house_number) {
+        $labels = [
+            '1' => __('1st House', 'natal-chart-plugin'),
+            '2' => __('2nd House', 'natal-chart-plugin'),
+            '3' => __('3rd House', 'natal-chart-plugin'),
+            '4' => __('4th House', 'natal-chart-plugin'),
+            '5' => __('5th House', 'natal-chart-plugin'),
+            '6' => __('6th House', 'natal-chart-plugin'),
+            '7' => __('7th House', 'natal-chart-plugin'),
+            '8' => __('8th House', 'natal-chart-plugin'),
+            '9' => __('9th House', 'natal-chart-plugin'),
+            '10' => __('10th House', 'natal-chart-plugin'),
+            '11' => __('11th House', 'natal-chart-plugin'),
+            '12' => __('12th House', 'natal-chart-plugin')
+        ];
+        return isset($labels[$house_number]) ? $labels[$house_number] : $house_number;
+    }
+
+    /**
      * Get aspect symbol
      * 
      * @param string $aspect_type Aspect type
@@ -888,6 +1251,22 @@ class Natal_Chart_Form {
             return esc_html($errors[$field_name]);
         }
         return '';
+    }
+
+    /**
+     * Get interpretation preview text
+     * @param string $interpretation Full interpretation text
+     * @return string Preview text (first 100 characters)
+     */
+    private function get_interpretation_preview($interpretation) {
+        // Remove HTML tags for preview
+        $clean_text = strip_tags($interpretation);
+        // Get first 100 characters
+        $preview = substr($clean_text, 0, 100);
+        if (strlen($clean_text) > 100) {
+            $preview .= '...';
+        }
+        return esc_html($preview);
     }
 
     /**

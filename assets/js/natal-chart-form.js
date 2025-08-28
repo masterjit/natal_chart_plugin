@@ -1572,30 +1572,64 @@ window.checkFormState = function() {
 // Toggle section functionality for natal chart results
 function toggleSection(toggleElement) {
     const content = toggleElement.nextElementSibling;
-    const isCollapsed = content.classList.contains('collapsed');
     
-    if (isCollapsed) {
-        // Expand section
-        content.classList.remove('collapsed');
-        toggleElement.classList.remove('collapsed');
-    } else {
-        // Collapse section
-        content.classList.add('collapsed');
-        toggleElement.classList.add('collapsed');
+    if (content && content.classList.contains('natal-chart-section-content')) {
+        if (toggleElement.classList.contains('collapsed')) {
+            // Expand section
+            content.style.display = 'block';
+            toggleElement.classList.remove('collapsed');
+        } else {
+            // Collapse section
+            content.style.display = 'none';
+            toggleElement.classList.add('collapsed');
+        }
     }
 }
 
-// Initialize all sections as expanded by default
+// Initialize all sections as collapsed by default
 function initializeToggleableSections() {
     const toggles = document.querySelectorAll('.natal-chart-section-toggle');
     toggles.forEach(toggle => {
-        toggle.classList.remove('collapsed');
         const content = toggle.nextElementSibling;
         if (content && content.classList.contains('natal-chart-section-content')) {
-            content.classList.remove('collapsed');
+            // Ensure sections start collapsed
+            content.style.display = 'none';
+            toggle.classList.add('collapsed');
         }
     });
 }
+
+// Toggle interpretation functionality for planetary aspects
+function toggleInterpretation(toggleElement) {
+    const interpretationDiv = toggleElement.closest('.natal-chart-interpretation');
+    const remainingContent = interpretationDiv.querySelector('.natal-chart-interpretation-remaining');
+    const button = toggleElement;
+    
+    if (remainingContent.style.display === 'none') {
+        // Show remaining content
+        remainingContent.style.display = 'inline';
+        button.textContent = 'Show Less';
+        
+        // Hide the triple dots that come before the remaining content
+        const tripleDots = interpretationDiv.querySelector('.natal-chart-triple-dots');
+        if (tripleDots) {
+            tripleDots.style.display = 'none';
+        }
+    } else {
+        // Hide remaining content
+        remainingContent.style.display = 'none';
+        button.textContent = 'Show More';
+        
+        // Show the triple dots again
+        const tripleDots = interpretationDiv.querySelector('.natal-chart-triple-dots');
+        if (tripleDots) {
+            tripleDots.style.display = 'inline';
+        }
+    }
+}
+
+// Make toggleInterpretation function globally available
+window.toggleInterpretation = toggleInterpretation;
 
 // Make toggleSection function globally available
 window.toggleSection = toggleSection;
