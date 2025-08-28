@@ -1,6 +1,6 @@
 /**
  * Location Autocomplete for Natal Chart Form
- * Handles location search and selection with debouncing
+ * Handles location search and selection with enhanced debouncing
  */
 
 class NatalChartLocationAutocomplete {
@@ -10,6 +10,9 @@ class NatalChartLocationAutocomplete {
         this.selectedLocation = null;
         this.searchTimeout = null;
         this.isSearching = false;
+        this.lastQuery = '';
+        this.debounceDelay = 400; // Increased debounce delay for better performance
+        this.minQueryLength = 2;
         
         this.init();
     }
@@ -20,21 +23,18 @@ class NatalChartLocationAutocomplete {
         
         // Validate that both required elements exist
         if (!this.searchInput) {
-            console.error('Natal Chart: Location search input not found');
             return;
         }
         
         if (!this.resultsContainer) {
-            console.error('Natal Chart: Location results container not found');
             return;
         }
         
-        console.log('Natal Chart: Location autocomplete initialized successfully');
         this.bindEvents();
     }
 
     bindEvents() {
-        // Search input events
+        // Search input events with enhanced debouncing
         this.searchInput.addEventListener('input', (e) => this.handleSearchInput(e));
         this.searchInput.addEventListener('focus', () => this.handleSearchFocus());
         this.searchInput.addEventListener('blur', () => this.handleSearchBlur());
@@ -45,6 +45,30 @@ class NatalChartLocationAutocomplete {
         
         // Add form validation events
         this.bindFormValidationEvents();
+    }
+
+    // Enhanced debounce function
+    debounce(func, delay) {
+        return (...args) => {
+            // Clear previous timeout
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+            
+            // Set new timeout
+            this.searchTimeout = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    }
+
+    // Debounced search function - fixed method definition
+    debouncedSearch(query) {
+        if (query.length >= this.minQueryLength) {
+            this.searchLocations(query);
+        } else {
+            this.hideResultsContainer();
+        }
     }
 
     bindFormValidationEvents() {
@@ -132,17 +156,33 @@ class NatalChartLocationAutocomplete {
         // Clear selected location if input is cleared
         if (!query) {
             this.clearSelection();
+            this.hideResultsContainer();
+            this.removeSearchStates();
             return;
         }
         
-        // Debounce search
+        // Don't search if query is too short
+        if (query.length < this.minQueryLength) {
+            this.hideResultsContainer();
+            this.removeSearchStates();
+            return;
+        }
+        
+        // Don't search if query hasn't changed
+        if (query === this.lastQuery) {
+            return;
+        }
+        
+        // Update last query
+        this.lastQuery = query;
+        
+        // Show debouncing state
+        this.showDebouncingState();
+        
+        // Use debounced search with timeout
         this.searchTimeout = setTimeout(() => {
-            if (query.length >= 2) {
-                this.searchLocations(query);
-            } else {
-                this.hideResultsContainer();
-            }
-        }, 300);
+            this.debouncedSearch(query);
+        }, this.debounceDelay);
     }
 
     handleSearchFocus() {
@@ -220,16 +260,25 @@ class NatalChartLocationAutocomplete {
     }
 
     async searchLocations(query) {
-        if (this.isSearching) return;
+        if (this.isSearching) {
+            return;
+        }
+        
+        // Rate limiting: don't search if we just searched for this query
+        if (this.lastQuery === query && this.isSearching) {
+            return;
+        }
+        
+        // Check if natal_chart_ajax is available
+        if (!window.natal_chart_ajax || !natal_chart_ajax.ajax_url) {
+            this.showError('Search functionality not available');
+            return;
+        }
         
         this.isSearching = true;
         this.showSearchingState();
         
         try {
-            console.log('Searching for locations with query:', query);
-            console.log('AJAX URL:', natal_chart_ajax.ajax_url);
-            console.log('Nonce:', natal_chart_ajax.nonce);
-            
             const response = await fetch(natal_chart_ajax.ajax_url, {
                 method: 'POST',
                 headers: {
@@ -242,68 +291,81 @@ class NatalChartLocationAutocomplete {
                 })
             });
             
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            
             const data = await response.json();
-            console.log('Full response data:', data);
-            console.log('Data structure:', {
-                success: data.success,
-                hasData: !!data.data,
-                dataType: typeof data.data,
-                dataKeys: data.data ? Object.keys(data.data) : 'No data object',
-                hasResults: data.data && data.data.results,
-                resultsType: data.data && data.data.results ? typeof data.data.results : 'No results',
-                isResultsArray: data.data && data.data.results ? Array.isArray(data.data.results) : 'No results'
-            });
             
             if (data.success) {
-                console.log('Success response, data structure:', data.data);
                 if (data.data && data.data.results) {
-                    console.log('Results found:', data.data.results);
                     this.displayResults(data.data.results);
                 } else {
-                    console.error('No results data found in response');
-                    this.showError('No location data received from server');
+                    this.showNoResults();
                 }
             } else {
-                console.error('API returned error:', data);
-                const errorMessage = data.data && data.data.message ? data.data.message : natal_chart_ajax.strings.error;
+                const errorMessage = data.data && data.data.message ? data.data.message : 'Search failed';
                 this.showError(errorMessage);
             }
         } catch (error) {
-            console.error('Location search error:', error);
-            this.showError(natal_chart_ajax.strings.error);
+            this.showError('Search failed. Please try again.');
         } finally {
             this.isSearching = false;
         }
     }
 
     showSearchingState() {
+        if (!this.resultsContainer) return;
+        
+        // Get strings with fallbacks
+        const searchingText = (window.natal_chart_ajax && natal_chart_ajax.strings && natal_chart_ajax.strings.searching) 
+            ? natal_chart_ajax.strings.searching 
+            : 'Searching...';
+        
         this.resultsContainer.innerHTML = `
             <div class="natal-chart-location-loading">
                 <span class="natal-chart-spinner"></span>
-                <span class="natal-chart-loading-text">${natal_chart_ajax.strings.searching}</span>
+                <span class="natal-chart-loading-text">${searchingText}</span>
             </div>
         `;
         this.showResultsContainer();
     }
 
+    // Show debouncing state
+    showDebouncingState() {
+        if (this.searchInput) {
+            this.searchInput.classList.add('debouncing');
+            this.searchInput.classList.remove('searching');
+        }
+    }
+
+    // Remove all search states
+    removeSearchStates() {
+        if (this.searchInput) {
+            this.searchInput.classList.remove('debouncing', 'searching');
+        }
+    }
+
+    // Add method to cancel ongoing searches
+    cancelSearch() {
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = null;
+        }
+        this.isSearching = false;
+    }
+
+    // Add method to reset search state
+    resetSearchState() {
+        this.lastQuery = '';
+        this.cancelSearch();
+        this.hideResultsContainer();
+    }
+
     displayResults(locations) {
-        // Add better data validation and debugging
-        console.log('Display results called with:', locations);
-        console.log('Type of locations:', typeof locations);
-        console.log('Is Array?', Array.isArray(locations));
-        
         // Ensure locations is an array
         if (!locations) {
-            console.error('Locations data is null or undefined');
             this.showNoResults();
             return;
         }
         
         if (!Array.isArray(locations)) {
-            console.error('Locations data is not an array:', locations);
             this.showError('Invalid data format received from server');
             return;
         }
@@ -328,24 +390,32 @@ class NatalChartLocationAutocomplete {
             this.showResultsContainer();
             this.bindResultEvents();
         } catch (error) {
-            console.error('Error processing location results:', error);
             this.showError('Error processing location results');
         }
     }
 
     showNoResults() {
+        const noResultsText = (window.natal_chart_ajax && natal_chart_ajax.strings && natal_chart_ajax.strings.no_results) 
+            ? natal_chart_ajax.strings.no_results 
+            : 'No results found';
+            
         this.resultsContainer.innerHTML = `
             <div class="natal-chart-location-no-results">
-                <div class="natal-chart-location-no-results-message">${natal_chart_ajax.strings.no_results}</div>
+                <div class="natal-chart-location-no-results-message">${noResultsText}</div>
             </div>
         `;
         this.showResultsContainer();
     }
 
     showError(message) {
+        const errorText = message || 
+            ((window.natal_chart_ajax && natal_chart_ajax.strings && natal_chart_ajax.strings.error) 
+                ? natal_chart_ajax.strings.error 
+                : 'An error occurred');
+                
         this.resultsContainer.innerHTML = `
             <div class="natal-chart-location-error">
-                <div class="natal-chart-location-error-message">${this.escapeHtml(message)}</div>
+                <div class="natal-chart-location-error-message">${this.escapeHtml(errorText)}</div>
             </div>
         `;
         this.showResultsContainer();
@@ -367,16 +437,6 @@ class NatalChartLocationAutocomplete {
         const locationData = JSON.parse(resultElement.dataset.location);
         this.selectedLocation = locationData;
         
-        console.log('Location selected:', locationData.label);
-        console.log('Checking if main form handler is available...');
-        console.log('window.natalChartForm exists:', !!window.natalChartForm);
-        
-        if (window.natalChartForm) {
-            console.log('Main form handler found, checking methods...');
-            console.log('updateSubmitButton method exists:', typeof window.natalChartForm.updateSubmitButton === 'function');
-            console.log('isFormValid method exists:', typeof window.natalChartForm.isFormValid === 'function');
-        }
-        
         // Populate form fields
         this.populateFormFields(locationData);
         
@@ -387,21 +447,15 @@ class NatalChartLocationAutocomplete {
         
         // Use the simple enableSubmitButton function
         if (typeof window.enableSubmitButton === 'function') {
-            console.log('Calling simple enableSubmitButton function...');
             window.enableSubmitButton();
         } else {
-            console.log('Simple enableSubmitButton function not available, trying main form handler...');
             // Fallback to main form handler
             if (window.natalChartForm && typeof window.natalChartForm.updateSubmitButton === 'function') {
-                console.log('Calling main form handler updateSubmitButton...');
                 try {
                     window.natalChartForm.updateSubmitButton();
-                    console.log('✅ Successfully called updateSubmitButton');
                 } catch (error) {
-                    console.error('❌ Error calling updateSubmitButton:', error);
+                    // Silent error handling
                 }
-            } else {
-                console.warn('❌ No submit button update method available');
             }
         }
         
@@ -422,47 +476,23 @@ class NatalChartLocationAutocomplete {
         
         // Ensure decimal precision for timezone offset
         const offsetRound = location.offset_round;
-        console.log('🔍 Original offset_round value:', offsetRound, 'Type:', typeof offsetRound);
         
         if (offsetRound !== undefined && offsetRound !== null) {
             // Convert to number and preserve exact decimal places
             const offsetValue = parseFloat(offsetRound);
-            console.log('🔍 Parsed offset value:', offsetValue, 'Type:', typeof offsetValue);
             
             if (!isNaN(offsetValue)) {
-                // Don't use toFixed() to avoid rounding, preserve exact value
-                const formattedValue = offsetValue.toString();
-                console.log('🔍 Formatted value to set:', formattedValue);
-                
                 // Set the value directly without formatting
                 document.getElementById('natal_chart_offset_round').value = offsetValue;
-                
-                // Verify the value was set correctly
-                const actualValue = document.getElementById('natal_chart_offset_round').value;
-                console.log('🔍 Actual value in field after setting:', actualValue);
                 
                 // Force the display to show the exact value
                 const inputField = document.getElementById('natal_chart_offset_round');
                 inputField.setAttribute('value', offsetValue);
                 inputField.value = offsetValue;
-                
-                // Double-check the final value
-                console.log('🔍 Final value after force set:', inputField.value);
-                
-                // Test: Manually verify decimal display
-                setTimeout(() => {
-                    const testValue = inputField.value;
-                    console.log('🔍 Test after 100ms delay:', testValue);
-                    console.log('🔍 Test value type:', typeof testValue);
-                    console.log('🔍 Test value length:', testValue.length);
-                    console.log('🔍 Test value includes decimal:', testValue.includes('.'));
-                }, 100);
             } else {
-                console.log('🔍 Invalid offset value, setting empty');
                 document.getElementById('natal_chart_offset_round').value = '';
             }
         } else {
-            console.log('🔍 No offset_round value, setting empty');
             document.getElementById('natal_chart_offset_round').value = '';
         }
     }
@@ -470,8 +500,7 @@ class NatalChartLocationAutocomplete {
     clearSelection() {
         this.selectedLocation = null;
         this.searchInput.classList.remove('natal-chart-location-selected');
-        
-        console.log('Location selection cleared');
+        this.removeSearchStates();
         
         // Clear all location-related fields
         document.getElementById('natal_chart_location').value = '';
@@ -485,21 +514,15 @@ class NatalChartLocationAutocomplete {
         
         // Use the simple enableSubmitButton function
         if (typeof window.enableSubmitButton === 'function') {
-            console.log('Calling simple enableSubmitButton function after clearing selection...');
             window.enableSubmitButton();
         } else {
-            console.log('Simple enableSubmitButton function not available, trying main form handler...');
             // Fallback to main form handler
             if (window.natalChartForm && typeof window.natalChartForm.updateSubmitButton === 'function') {
-                console.log('Calling main form handler updateSubmitButton after clearing selection...');
                 try {
                     window.natalChartForm.updateSubmitButton();
-                    console.log('✅ Successfully called updateSubmitButton');
                 } catch (error) {
-                    console.error('❌ Error calling updateSubmitButton:', error);
+                    // Silent error handling
                 }
-            } else {
-                console.warn('❌ No submit button update method available');
             }
         }
     }
@@ -550,7 +573,6 @@ class NatalChartLocationAutocomplete {
 
 // Global function to manually initialize location autocomplete
 window.initializeLocationAutocompleteManually = function() {
-    console.log('Manual location autocomplete initialization requested...');
     return initializeLocationAutocomplete();
 };
 
@@ -573,62 +595,56 @@ window.getLocationAutocompleteStatus = function() {
 
 // Robust initialization that waits for the form to appear
 function initializeLocationAutocomplete() {
-    console.log('Checking for location autocomplete elements...');
+
     
     const searchInput = document.getElementById('natal_chart_location_search');
     const resultsContainer = document.getElementById('natal-chart-location-results');
     
     if (searchInput && resultsContainer) {
-        console.log('Location autocomplete elements found! Initializing...');
+
         
         // Check if already initialized
         if (window.natalChartLocationAutocomplete) {
-            console.log('Location autocomplete already exists');
+
             return true;
         }
         
         try {
             window.natalChartLocationAutocomplete = new NatalChartLocationAutocomplete();
-            console.log('Location autocomplete initialized successfully');
+
             return true;
         } catch (error) {
-            console.error('Error initializing location autocomplete:', error);
+
             return false;
         }
     } else {
-        console.log('Location autocomplete elements not found yet, will retry...');
+
         return false;
     }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded - Starting location autocomplete detection...');
-    
     // Try to initialize immediately
     if (!initializeLocationAutocomplete()) {
         // If elements not found, start polling
-        console.log('Starting location autocomplete detection polling...');
         const autocompleteCheckInterval = setInterval(() => {
             if (initializeLocationAutocomplete()) {
                 clearInterval(autocompleteCheckInterval);
-                console.log('Location autocomplete detected and initialized, stopping polling');
             }
         }, 500); // Check every 500ms
         
         // Stop polling after 10 seconds
         setTimeout(() => {
             clearInterval(autocompleteCheckInterval);
-            console.log('Location autocomplete detection timeout - elements may not be present on this page');
         }, 10000);
     }
 });
 
 // Also try to initialize if DOM is already loaded
 if (document.readyState === 'loading') {
-    console.log('DOM still loading, waiting for DOMContentLoaded...');
+    // DOM still loading, waiting for DOMContentLoaded...
 } else {
-    console.log('DOM already loaded, checking for location autocomplete elements immediately...');
     initializeLocationAutocomplete();
 }
 
@@ -644,7 +660,6 @@ if (typeof MutationObserver !== 'undefined') {
                             node.querySelector('#natal_chart_location_search') ||
                             node.id === 'natal_chart-location-results' ||
                             node.querySelector('#natal_chart-location-results')) {
-                            console.log('Location autocomplete elements detected via MutationObserver');
                             setTimeout(initializeLocationAutocomplete, 100);
                         }
                     }
@@ -658,6 +673,29 @@ if (typeof MutationObserver !== 'undefined') {
         childList: true,
         subtree: true
     });
-    
-    console.log('MutationObserver started for dynamic location autocomplete detection');
 }
+
+// Global function to test autocomplete functionality
+window.testLocationAutocomplete = function() {
+    // Check if elements exist
+    const searchInput = document.getElementById('natal_chart_location_search');
+    const resultsContainer = document.getElementById('natal_chart-location-results');
+    
+    // Check if autocomplete is initialized
+    if (window.natalChartLocationAutocomplete) {
+        // Autocomplete is available
+    }
+    
+    // Check if natal_chart_ajax is available
+    if (window.natal_chart_ajax) {
+        // AJAX is available
+    }
+    
+    // Test event binding
+    if (searchInput) {
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+};
+
+// Also expose the initialization function globally for manual testing
+window.initializeLocationAutocomplete = initializeLocationAutocomplete;
