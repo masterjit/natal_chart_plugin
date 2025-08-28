@@ -477,9 +477,19 @@ class Natal_Chart_Form {
             $html .= $this->format_houses_section($data['houses']);
         }
         
-        // Aspects Section
+        // Aspects Section (Major Aspects)
         if (isset($data['aspects']) && is_array($data['aspects'])) {
             $html .= $this->format_aspects_section($data['aspects']);
+        }
+        
+        // Planetary Aspects Section (Detailed Interpretations)
+        if (isset($data['interpretations']['planetary_aspects']) && is_array($data['interpretations']['planetary_aspects'])) {
+            $html .= $this->format_planetary_aspects_section($data['interpretations']['planetary_aspects']);
+        }
+        
+        // Planets Section (Detailed Interpretations)
+        if (isset($data['interpretations']['planets']) && is_array($data['interpretations']['planets'])) {
+            $html .= $this->format_planets_interpretations_section($data['interpretations']['planets']);
         }
         
         // Additional astrological data
@@ -651,6 +661,166 @@ class Natal_Chart_Form {
         
         $html .= '</tbody></table></div>';
         $html .= '</div></div>';
+        return $html;
+    }
+
+    /**
+     * Format planetary aspects section
+     * 
+     * @param array $planetary_aspects Planetary aspects data
+     * @return string Formatted HTML
+     */
+    private function format_planetary_aspects_section($planetary_aspects) {
+        if (empty($planetary_aspects) || !isset($planetary_aspects['aspects']) || !is_array($planetary_aspects['aspects'])) {
+            return '<div style="background: #ffebee; padding: 10px; margin: 10px 0; border: 1px solid #f44336; color: #c62828;">Debug: No planetary aspects data found. Data: ' . print_r($planetary_aspects, true) . '</div>';
+        }
+
+        $html = '<div class="natal-chart-section natal-chart-planetary-aspects">';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('PLANETARY ASPECTS', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        
+        $html .= '<div class="natal-chart-section-content">'; // Removed style="display: none;" temporarily
+        
+        // Header description
+        if (!empty($planetary_aspects['header'])) {
+            $html .= '<div class="natal-chart-section-description">';
+            $html .= wp_kses_post(nl2br($planetary_aspects['header']));
+            $html .= '</div>';
+        }
+        
+        $html .= '<div class="natal-chart-planetary-aspects-list">';
+        
+        foreach ($planetary_aspects['aspects'] as $aspect) {
+            $html .= '<div class="natal-chart-planetary-aspect-item natal-chart-planetary-aspect-' . strtolower($aspect['aspect'] ?? '') . '">';
+            
+            // Header section with Planet 1, Aspect, Planet 2, and Orb
+            $html .= '<div class="natal-chart-planetary-aspect-header">';
+            $html .= '<div class="natal-chart-planetary-aspect-planets">';
+            $html .= '<span class="natal-chart-planet1">' . esc_html($aspect['planet1'] ?? '') . '</span>';
+            $html .= '<span class="natal-chart-aspect-symbol">' . $this->get_aspect_symbol($aspect['aspect'] ?? '') . '</span>';
+            $html .= '<span class="natal-chart-planet2">' . esc_html($aspect['planet2'] ?? '') . '</span>';
+            if (isset($aspect['orb'])) {
+                $html .= '<span class="natal-chart-aspect-orb-inline"> (Orb: ' . number_format($aspect['orb'], 2) . '°)</span>';
+            }
+            $html .= '</div>';
+            $html .= '</div>';
+            
+            // Content section with Interpretation
+            $html .= '<div class="natal-chart-planetary-aspect-content">';
+            
+            // Interpretation with continuation logic
+            $interpretation = $aspect['interpretation'] ?? '';
+            if (!empty($interpretation)) {
+                // Show first 300 characters initially (longer preview)
+                $initial_length = 300;
+                $initial_content = substr($interpretation, 0, $initial_length);
+                $remaining_content = substr($interpretation, $initial_length);
+                
+                $html .= '<div class="natal-chart-interpretation">';
+                $html .= wp_kses_post($initial_content);
+                
+                // If there's remaining content, add it in a hidden div
+                if (!empty($remaining_content)) {
+                    $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
+                    $html .= wp_kses_post($remaining_content);
+                    $html .= '</span>';
+                    
+                    $html .= '<div class="natal-chart-interpretation-toggle">';
+                    $html .= '<button type="button" class="natal-chart-show-more" onclick="toggleInterpretation(this)">';
+                    $html .= __('Show More', 'natal-chart-plugin');
+                    $html .= '</button>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div>';
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
+        return $html;
+    }
+
+    /**
+     * Format planets interpretations section
+     * 
+     * @param array $planets_interpretations Planets interpretations data
+     * @return string Formatted HTML
+     */
+    private function format_planets_interpretations_section($planets_interpretations) {
+        if (empty($planets_interpretations) || !isset($planets_interpretations['planets']) || !is_array($planets_interpretations['planets'])) {
+            return '<div style="background: #e0f2f7; padding: 10px; margin: 10px 0; border: 1px solid #00bcd4; color: #00796b;">Debug: No planetary interpretations data found. Data: ' . print_r($planets_interpretations, true) . '</div>';
+        }
+
+        $html = '<div class="natal-chart-section natal-chart-planetary-interpretations">';
+        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('PLANETARY INTERPRETATIONS', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        
+        $html .= '<div class="natal-chart-section-content">'; // Removed style="display: none;" temporarily
+        
+        // Header description
+        if (!empty($planets_interpretations['header'])) {
+            $html .= '<div class="natal-chart-section-description">';
+            $html .= wp_kses_post(nl2br($planets_interpretations['header']));
+            $html .= '</div>';
+        }
+        
+        $html .= '<div class="natal-chart-planetary-interpretations-list">';
+        
+        foreach ($planets_interpretations['planets'] as $planet) {
+            $html .= '<div class="natal-chart-planetary-interpretation-item">';
+            
+            // Header section with Planet Name
+            $html .= '<div class="natal-chart-planetary-interpretation-header">';
+            $html .= '<span class="natal-chart-planet-symbol">' . $this->get_planet_symbol($planet['name'] ?? '') . '</span>';
+            $html .= '<span class="natal-chart-planet-name">' . esc_html($planet['name'] ?? '') . '</span>';
+            $html .= '</div>';
+            
+            // Content section with Interpretation
+            $html .= '<div class="natal-chart-planetary-interpretation-content">';
+            
+            // Interpretation with continuation logic
+            $interpretation = $planet['interpretation'] ?? '';
+            if (!empty($interpretation)) {
+                // Show first 300 characters initially (longer preview)
+                $initial_length = 300;
+                $initial_content = substr($interpretation, 0, $initial_length);
+                $remaining_content = substr($interpretation, $initial_length);
+                
+                $html .= '<div class="natal-chart-interpretation">';
+                $html .= wp_kses_post($initial_content);
+                
+                // If there's remaining content, add it in a hidden div
+                if (!empty($remaining_content)) {
+                    $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
+                    $html .= wp_kses_post($remaining_content);
+                    $html .= '</span>';
+                    
+                    $html .= '<div class="natal-chart-interpretation-toggle">';
+                    $html .= '<button type="button" class="natal-chart-show-more" onclick="toggleInterpretation(this)">';
+                    $html .= __('Show More', 'natal-chart-plugin');
+                    $html .= '</button>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div>';
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
         return $html;
     }
 
@@ -888,6 +1058,22 @@ class Natal_Chart_Form {
             return esc_html($errors[$field_name]);
         }
         return '';
+    }
+
+    /**
+     * Get interpretation preview text
+     * @param string $interpretation Full interpretation text
+     * @return string Preview text (first 100 characters)
+     */
+    private function get_interpretation_preview($interpretation) {
+        // Remove HTML tags for preview
+        $clean_text = strip_tags($interpretation);
+        // Get first 100 characters
+        $preview = substr($clean_text, 0, 100);
+        if (strlen($clean_text) > 100) {
+            $preview .= '...';
+        }
+        return esc_html($preview);
     }
 
     /**

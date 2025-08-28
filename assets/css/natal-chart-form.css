@@ -309,7 +309,7 @@
 }
 
 .natal-chart-results-content {
-    color: #2c3e50;
+    color: #000000;
     line-height: 1.6;
 }
 
@@ -363,12 +363,14 @@
     font-weight: 600;
 }
 
+/*
 .natal-chart-data-content {
     background: #f8f9fa;
     padding: 20px;
     border-radius: 6px;
     border: 1px solid #e9ecef;
 }
+*/
 
 .natal-chart-json-data {
     background: #2c3e50;
@@ -521,6 +523,179 @@
     overflow-x: auto;
 }
 
+/* Planetary Aspects Section */
+.natal-chart-planetary-aspects-table {
+    overflow-x: auto;
+}
+
+/* Planetary Aspects List - New Layout */
+.natal-chart-planetary-aspects-list {
+    margin-top: 20px;
+}
+
+.natal-chart-planetary-aspect-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.natal-chart-planetary-aspect-header {
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 8px 8px 0 0;
+}
+
+.natal-chart-planetary-aspect-planets {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 8px;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.natal-chart-planet1,
+.natal-chart-planet2 {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #2c3e50;
+}
+
+.natal-chart-aspect-symbol {
+    font-size: 1.2em;
+    color: #e74c3c;
+}
+
+.natal-chart-aspect-orb-inline {
+    font-weight: bold;
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+.natal-chart-planetary-aspect-content {
+    padding: 20px;
+}
+
+
+
+.natal-chart-interpretation-section {
+    margin-top: 15px;
+}
+
+/* Planetary Aspects Header */
+.natal-chart-planetary-aspects-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.natal-chart-planetary-aspects-header p {
+    margin: 0;
+    color: #495057;
+    line-height: 1.6;
+    font-size: 14px;
+    text-align: justify;
+}
+
+/* Interpretation Toggle 
+.natal-chart-interpretation-toggle {
+    cursor: pointer;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 6px;
+    border: 1px solid #90caf9;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.natal-chart-interpretation-toggle:hover {
+    background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+*/
+
+.interpretation-preview {
+    display: block;
+    color: #1976d2;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 5px;
+}
+
+.interpretation-toggle-text {
+    color: #1565c0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.interpretation-toggle-text::after {
+    content: ' ▼';
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+.natal-chart-interpretation-toggle.expanded .interpretation-toggle-text::after {
+    transform: rotate(180deg);
+}
+
+/* Full Interpretation */
+.natal-chart-interpretation-full {
+    background: white;
+    border: 1px solid #e3f2fd;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 10px;
+    color: #424242;
+    line-height: 1.6;
+    font-size: 13px;
+}
+
+.natal-chart-interpretation-full p {
+    margin: 0 0 10px 0;
+}
+
+.natal-chart-interpretation-full p:last-child {
+    margin-bottom: 0;
+}
+
+.natal-chart-interpretation-full b,
+.natal-chart-interpretation-full strong {
+    color: #1976d2;
+    font-weight: 600;
+}
+
+/* No Interpretation */
+.no-interpretation {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 12px;
+}
+
+/* No Aspects Message */
+.natal-chart-no-aspects {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #dee2e6;
+}
+
+.natal-chart-no-aspects p {
+    margin: 0;
+    font-size: 14px;
+}
+
 .natal-chart-table {
     width: 100%;
     border-collapse: collapse;
@@ -590,6 +765,16 @@
 .natal-chart-aspect-type::before {
     font-size: 18px;
     font-weight: bold;
+}
+
+/* Planetary Aspects Row Styling */
+.natal-chart-planetary-aspect-row {
+    transition: all 0.3s ease;
+}
+
+.natal-chart-planetary-aspect-row:hover {
+    background-color: #f8f9fa;
+    transform: translateX(2px);
 }
 
 
@@ -1153,6 +1338,51 @@
         overflow-x: visible;
     }
     
+    .natal-chart-planetary-aspects-table {
+        overflow-x: visible;
+    }
+    
+    /* Planetary Aspects List - Mobile Responsive */
+    .natal-chart-planetary-aspects-list {
+        margin-top: 15px;
+    }
+    
+    .natal-chart-planetary-aspect-item {
+        margin-bottom: 15px;
+    }
+    
+    .natal-chart-planetary-aspect-header {
+        padding: 12px 15px;
+    }
+    
+    .natal-chart-planetary-aspect-planets {
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+    
+    .natal-chart-planet1,
+    .natal-chart-planet2 {
+        font-size: 14px;
+    }
+    
+    .natal-chart-aspect-symbol {
+        font-size: 18px;
+    }
+    
+    .natal-chart-aspect-type {
+        font-size: 12px;
+    }
+    
+    .natal-chart-planetary-aspect-content {
+        padding: 15px;
+    }
+    
+    .natal-chart-aspect-orb {
+        margin-bottom: 12px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    
     .natal-chart-table {
         display: block;
         width: 100%;
@@ -1671,9 +1901,17 @@
     overflow: visible;
 }
 
+.natal-chart-section-content:not(.collapsed) .natal-chart-planetary-aspects-table {
+    overflow: visible;
+}
+
 .natal-chart-section-content:not(.collapsed) .natal-chart-table {
     display: table;
     width: 100%;
+}
+
+.natal-chart-section-content:not(.collapsed) .natal-chart-planetary-aspects-table {
+    display: block;
 }
 
 .natal-chart-section-content:not(.collapsed) .natal-chart-table tbody {
@@ -1739,4 +1977,50 @@
     .natal-chart-table tr {
         font-size: 12px !important;
     }
+}
+
+/* Interpretation continuation styling */
+.natal-chart-interpretation {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.natal-chart-interpretation-remaining {
+    display: none;
+}
+
+.natal-chart-interpretation-toggle {
+    margin-top: 10px;
+}
+
+.natal-chart-show-more {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.natal-chart-show-more:hover {
+    background: #2980b9;
+}
+
+.natal-chart-show-more:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
+
+/* Debug output styling */
+.natal-chart-debug {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
 }

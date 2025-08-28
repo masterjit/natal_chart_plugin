@@ -1600,6 +1600,26 @@ function initializeToggleableSections() {
 // Make toggleSection function globally available
 window.toggleSection = toggleSection;
 
+// Toggle interpretation functionality for planetary aspects
+function toggleInterpretation(toggleElement) {
+    const interpretationDiv = toggleElement.closest('.natal-chart-interpretation');
+    const remainingContent = interpretationDiv.querySelector('.natal-chart-interpretation-remaining');
+    const button = toggleElement;
+    
+    if (remainingContent.style.display === 'none') {
+        // Show remaining content
+        remainingContent.style.display = 'inline';
+        button.textContent = 'Show Less';
+    } else {
+        // Hide remaining content
+        remainingContent.style.display = 'none';
+        button.textContent = 'Show More';
+    }
+}
+
+// Make toggleInterpretation function globally available
+window.toggleInterpretation = toggleInterpretation;
+
 // Initialize sections when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     initializeToggleableSections();
