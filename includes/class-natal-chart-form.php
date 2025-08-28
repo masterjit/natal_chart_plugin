@@ -594,11 +594,11 @@ class Natal_Chart_Form {
      * @return string Formatted HTML
      */
     private function format_houses_section($houses) {
-        $html = '<div class="natal-chart-section">';
-        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html = '<div class="natal-chart-section natal-chart-houses">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
         $html .= '<span>' . __('House Cusps', 'natal-chart-plugin') . '</span>';
         $html .= '</div>';
-        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
         $html .= '<div class="natal-chart-houses-grid">';
         
         foreach ($houses as $house) {
@@ -636,11 +636,11 @@ class Natal_Chart_Form {
      * @return string Formatted HTML
      */
     private function format_aspects_section($aspects) {
-        $html = '<div class="natal-chart-section">';
-        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html = '<div class="natal-chart-section natal-chart-aspects">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
         $html .= '<span>' . __('Major Aspects', 'natal-chart-plugin') . '</span>';
         $html .= '</div>';
-        $html .= '<div class="natal-chart-section-content">';
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
         $html .= '<div class="natal-chart-aspects-table">';
         $html .= '<table class="natal-chart-table">';
         $html .= '<thead><tr>';
@@ -676,11 +676,11 @@ class Natal_Chart_Form {
         }
 
         $html = '<div class="natal-chart-section natal-chart-planetary-aspects">';
-        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
         $html .= '<span>' . __('PLANETARY ASPECTS', 'natal-chart-plugin') . '</span>';
         $html .= '</div>';
         
-        $html .= '<div class="natal-chart-section-content">'; // Removed style="display: none;" temporarily
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
         
         // Header description
         if (!empty($planetary_aspects['header'])) {
@@ -722,6 +722,7 @@ class Natal_Chart_Form {
                 
                 // If there's remaining content, add it in a hidden div
                 if (!empty($remaining_content)) {
+                    $html .= '<span class="natal-chart-triple-dots">...</span>'; // Add triple dots to indicate more content
                     $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
                     $html .= wp_kses_post($remaining_content);
                     $html .= '</span>';
@@ -754,16 +755,17 @@ class Natal_Chart_Form {
      * @return string Formatted HTML
      */
     private function format_planets_interpretations_section($planets_interpretations) {
-        if (empty($planets_interpretations) || !isset($planets_interpretations['planets']) || !is_array($planets_interpretations['planets'])) {
-            return '<div style="background: #e0f2f7; padding: 10px; margin: 10px 0; border: 1px solid #00bcd4; color: #00796b;">Debug: No planetary interpretations data found. Data: ' . print_r($planets_interpretations, true) . '</div>';
+        if (empty($planets_interpretations) || !is_array($planets_interpretations)) {
+            return '';
         }
 
-        $html = '<div class="natal-chart-section natal-chart-planetary-interpretations">';
-        $html .= '<div class="natal-chart-section-toggle" onclick="toggleSection(this)">';
-        $html .= '<span>' . __('PLANETARY INTERPRETATIONS', 'natal-chart-plugin') . '</span>';
+        $html = '<div class="natal-chart-section natal-chart-planets-interpretations">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('PLANETS INTERPRETATIONS', 'natal-chart-plugin') . '</span>';
         $html .= '</div>';
         
-        $html .= '<div class="natal-chart-section-content">'; // Removed style="display: none;" temporarily
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
+       
         
         // Header description
         if (!empty($planets_interpretations['header'])) {
@@ -772,22 +774,21 @@ class Natal_Chart_Form {
             $html .= '</div>';
         }
         
-        $html .= '<div class="natal-chart-planetary-interpretations-list">';
+        $html .= '<div class="natal-chart-planets-interpretations-list">';
         
-        foreach ($planets_interpretations['planets'] as $planet) {
-            $html .= '<div class="natal-chart-planetary-interpretation-item">';
+        foreach ($planets_interpretations as $planet_name => $planet_data) {
+            // Skip if it's not a planet or doesn't have sign data
+            if ($planet_name === 'header' || !isset($planet_data['sign'])) {
+                continue;
+            }
             
-            // Header section with Planet Name
-            $html .= '<div class="natal-chart-planetary-interpretation-header">';
-            $html .= '<span class="natal-chart-planet-symbol">' . $this->get_planet_symbol($planet['name'] ?? '') . '</span>';
-            $html .= '<span class="natal-chart-planet-name">' . esc_html($planet['name'] ?? '') . '</span>';
-            $html .= '</div>';
+            $html .= '<div class="natal-chart-planet-interpretation-item">';           
             
             // Content section with Interpretation
-            $html .= '<div class="natal-chart-planetary-interpretation-content">';
+            $html .= '<div class="natal-chart-planet-interpretation-content">';
             
             // Interpretation with continuation logic
-            $interpretation = $planet['interpretation'] ?? '';
+            $interpretation = $planet_data['sign'] ?? '';
             if (!empty($interpretation)) {
                 // Show first 300 characters initially (longer preview)
                 $initial_length = 300;
@@ -799,6 +800,7 @@ class Natal_Chart_Form {
                 
                 // If there's remaining content, add it in a hidden div
                 if (!empty($remaining_content)) {
+                    $html .= '<span class="natal-chart-triple-dots">...</span>'; // Add triple dots to indicate more content
                     $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
                     $html .= wp_kses_post($remaining_content);
                     $html .= '</span>';

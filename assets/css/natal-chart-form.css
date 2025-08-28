@@ -391,6 +391,7 @@
     gap: 25px;
 }
 
+/*
 .natal-chart-section {
     background: white;
     border-radius: 8px;
@@ -398,6 +399,7 @@
     border: 1px solid #e1e8ed;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
+*/
 
 .natal-chart-section-title {
     color: #2c3e50;
@@ -1848,10 +1850,11 @@
 }
 
 .natal-chart-section-toggle::after {
-    content: '▼';
-    font-size: 14px;
-    transition: transform 0.3s ease;
-    margin-left: 10px;
+    content: '+';
+    float: right;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
 }
 
 .natal-chart-section-toggle.collapsed::after {
@@ -2023,4 +2026,70 @@
     border-radius: 4px;
     font-family: monospace;
     font-size: 14px;
+}
+
+/* Planets Interpretations Section */
+.natal-chart-planets-interpretations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.natal-chart-planet-interpretation-item {
+    background: #ffffff;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.natal-chart-planet-interpretation-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.natal-chart-planet-interpretation-header {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.natal-chart-planet-interpretation-planets {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.natal-chart-planet1 {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #2c3e50;
+}
+
+.natal-chart-planet-sign {
+    font-weight: bold;
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+.natal-chart-planet-interpretation-content {
+    line-height: 1.6;
+}
+
+/* Section toggle collapsed/expanded states */
+.natal-chart-section-toggle::after {
+    content: '+';
+    float: right;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+}
+
+.natal-chart-section-toggle:not(.collapsed)::after {
+    content: '−';
+    color: white;
 }
