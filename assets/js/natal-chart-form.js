@@ -5,73 +5,44 @@
 
 class NatalChartForm {
     constructor() {
-        console.log('=== NATAL CHART FORM CONSTRUCTOR ===');
-        
         this.form = document.getElementById('natal_chart_form');
-        console.log('Form element found:', !!this.form);
-        
         this.submitButton = document.getElementById('natal_chart_submit');
-        console.log('Submit button found:', !!this.submitButton);
-        
         this.resultsContainer = document.getElementById('natal_chart-results');
-        console.log('Results container found:', !!this.resultsContainer);
-        if (this.resultsContainer) {
-            console.log('Results container ID:', this.resultsContainer.id);
-            console.log('Results container display:', this.resultsContainer.style.display);
-        }
-        
         this.isSubmitting = false;
         
         if (this.form && this.submitButton) {
-            console.log('✅ Form and submit button found, initializing...');
             this.init();
-        } else {
-            console.error('❌ Form or submit button not found!');
-            console.log('Form:', this.form);
-            console.log('Submit button:', this.submitButton);
         }
     }
 
     init() {
-        console.log('Initializing NatalChartForm...');
-        
         this.form = document.getElementById('natal_chart_form');
         this.submitButton = document.getElementById('natal_chart_submit');
         this.resultsContainer = document.getElementById('natal_chart_results');
         
-        console.log('Form element found:', this.form);
-        console.log('Submit button found:', this.submitButton);
-        console.log('Results container found:', this.resultsContainer);
-        
         if (this.form) {
-            console.log('Form found, binding events...');
             this.bindEvents();
             this.updateSubmitButton();
             
             // Also update submit button after a short delay to ensure all elements are ready
             setTimeout(() => {
-                console.log('Delayed submit button update...');
                 this.updateSubmitButton();
             }, 500);
-            
-            console.log('Form initialization complete');
-        } else {
-            console.error('Form element not found!');
         }
     }
 
     bindEvents() {
-        console.log('Binding form events...');
+        
         
         // Multiple safeguards against form submission
         this.form.addEventListener('submit', (e) => {
-            console.log('Submit event triggered');
+            
             this.handleSubmit(e);
         });
         
         // Additional prevention - prevent any form submission
         this.form.addEventListener('submit', (e) => {
-            console.log('Additional submit prevention');
+            
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -81,34 +52,26 @@ class NatalChartForm {
         const submitButton = this.submitButton;
         if (submitButton) {
             submitButton.addEventListener('click', (e) => {
-                console.log('=== SUBMIT BUTTON CLICKED ===');
+                
                 e.preventDefault();
                 e.stopPropagation();
                 
                 // Check if button is enabled
                 if (submitButton.disabled) {
-                    console.log('❌ Submit button is disabled, cannot submit form');
                     return false;
                 }
-                
-                console.log('✅ Submit button is enabled, proceeding with form submission...');
                 
                 // Check if all fields are filled using the simple system
                 if (typeof window.enableSubmitButton === 'function') {
                     const canSubmit = window.enableSubmitButton();
                     if (!canSubmit) {
-                        console.log('❌ Form validation failed, cannot submit');
                         return false;
                     }
-                    console.log('✅ Form validation passed, submitting...');
                 }
                 
                 // Trigger form submission manually
                 if (this.form) {
-                    console.log('Triggering form submission...');
                     this.handleSubmit(new Event('submit'));
-                } else {
-                    console.error('❌ Form element not found!');
                 }
                 
                 return false;
@@ -117,11 +80,9 @@ class NatalChartForm {
         
         // Form field changes for validation
         this.form.addEventListener('input', (e) => {
-            console.log('Form input event triggered by:', e.target.id);
             this.updateSubmitButton();
         });
         this.form.addEventListener('change', (e) => {
-            console.log('Form change event triggered by:', e.target.id);
             this.updateSubmitButton();
         });
         
@@ -130,21 +91,15 @@ class NatalChartForm {
         timeFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
-                console.log(`Adding event listeners to time field: ${fieldId}`);
                 field.addEventListener('input', (e) => {
-                    console.log(`Time field ${fieldId} input event triggered, value: "${e.target.value}"`);
                     this.updateSubmitButton();
                 });
                 field.addEventListener('change', (e) => {
-                    console.log(`Time field ${fieldId} change event triggered, value: "${e.target.value}"`);
                     this.updateSubmitButton();
                 });
                 field.addEventListener('blur', (e) => {
-                    console.log(`Time field ${fieldId} blur event triggered, value: "${e.target.value}"`);
                     this.updateSubmitButton();
                 });
-            } else {
-                console.warn(`Time field ${fieldId} not found during event binding`);
             }
         });
         
@@ -153,17 +108,12 @@ class NatalChartForm {
         otherFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
-                console.log(`Adding event listeners to field: ${fieldId}`);
                 field.addEventListener('input', (e) => {
-                    console.log(`Field ${fieldId} input event triggered, value: "${e.target.value}"`);
                     this.updateSubmitButton();
                 });
                 field.addEventListener('change', (e) => {
-                    console.log(`Field ${fieldId} change event triggered, value: "${e.target.value}"`);
                     this.updateSubmitButton();
                 });
-            } else {
-                console.warn(`Field ${fieldId} not found during event binding`);
             }
         });
         
@@ -173,51 +123,35 @@ class NatalChartForm {
             closeButton.addEventListener('click', () => this.closeResults());
         }
         
-        console.log('Form events bound successfully');
+
     }
 
     async handleSubmit(e) {
-        console.log('=== FORM SUBMISSION STARTED ===');
         e.preventDefault();
         
         if (this.isSubmitting) {
-            console.log('❌ Form already submitting, returning');
             return;
         }
-        
-        console.log('✅ Form submission allowed, starting validation...');
         
         if (!this.validateForm()) {
-            console.log('❌ Form validation failed, stopping submission');
             return;
         }
-        
-        console.log('✅ Form validation passed, starting submission process...');
         
         this.isSubmitting = true;
         this.showLoadingState();
         
         try {
-            console.log('Collecting form data...');
             const formData = this.getFormData();
-            console.log('Form data collected successfully:', formData);
-            
-            console.log('Submitting form to API...');
             const response = await this.submitForm(formData);
-            console.log('API response received:', response);
             
             if (response.success) {
-                console.log('✅ API request successful, handling response...');
                 this.handleSubmissionSuccess(response);
             } else {
-                console.log('❌ API request failed, handling error...');
                 this.handleSubmissionError(response);
             }
         } catch (error) {
-            console.error('❌ Form submission error:', error);
             this.showErrorMessage(natal_chart_ajax.strings.error);
         } finally {
-            console.log('Form submission process completed, resetting state...');
             this.isSubmitting = false;
             this.hideLoadingState();
         }
@@ -289,16 +223,12 @@ class NatalChartForm {
     }
 
     getFormData() {
-        console.log('Collecting form data...');
-        
         const formData = new FormData(this.form);
         
         // Get time values from the new time input fields
         const hour = parseInt(document.getElementById('natal_chart_birth_hour').value) || 0;
         const minute = parseInt(document.getElementById('natal_chart_birth_minute').value) || 0;
         const ampm = document.getElementById('natal_chart_birth_ampm').value;
-        
-        console.log('Time input values:', { hour, minute, ampm });
         
         // Convert 12-hour format to 24-hour format
         let birthTime24 = '';
@@ -312,8 +242,6 @@ class NatalChartForm {
             birthTime24 = `${hour24.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         }
         
-        console.log('Converted birth time (24-hour):', birthTime24);
-        
         // Add location data from readonly fields
         const latitude = document.getElementById('natal_chart_latitude').value;
         const longitude = document.getElementById('natal_chart_longitude').value;
@@ -323,8 +251,6 @@ class NatalChartForm {
         // Get location name from the hidden field or search field
         const locationName = document.getElementById('natal_chart_location').value || 
                            document.getElementById('natal_chart_location_search').value;
-        
-        console.log('Location data:', { latitude, longitude, timezone, houseSystem, locationName });
         
         const data = {
             natal_chart_name: formData.get('natal_chart_name'),
@@ -337,22 +263,14 @@ class NatalChartForm {
             natal_chart_location: locationName, // Add location field
             nonce: formData.get('natal_chart_nonce')
         };
-        
-        console.log('Final form data to be sent:', data);
         return data;
     }
 
     async submitForm(formData) {
-        console.log('=== SUBMITTING FORM TO API ===');
-        console.log('API URL:', natal_chart_ajax.ajax_url);
-        console.log('Form data to send:', formData);
-        
         const requestBody = new URLSearchParams({
             action: 'natal_chart_generate_chart',
             ...formData
         });
-        
-        console.log('Request body:', requestBody.toString());
         
         try {
             const response = await fetch(natal_chart_ajax.ajax_url, {
@@ -363,50 +281,28 @@ class NatalChartForm {
                 body: requestBody
             });
             
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            
             const responseData = await response.json();
-            console.log('Response data:', responseData);
-            
             return responseData;
         } catch (error) {
-            console.error('❌ Fetch error:', error);
             throw error;
         }
     }
 
     handleSubmissionSuccess(response) {
-        console.log('=== HANDLING SUBMISSION SUCCESS ===');
-        console.log('Full response:', response);
-        
         if (response.success && response.data) {
-            console.log('✅ Response is successful, data available');
-            console.log('Response data:', response.data);
-            console.log('Results HTML available:', !!response.data.results_html);
-            console.log('Results HTML length:', response.data.results_html ? response.data.results_html.length : 'N/A');
-            
             this.showSuccessMessage(response.data.message || 'Natal chart generated successfully!');
             
             document.getElementById('natal_chart_form').style.display='none';
 
             // Display results directly in the form's results container
-            console.log('Calling displayResults...');
             this.displayResults(response.data.results_html);
             
             // Scroll to results
-            console.log('Calling scrollToResults...');
             this.scrollToResults();
             
             // Enable the submit button again for new submissions
-            console.log('Calling updateSubmitButton...');
             this.updateSubmitButton();
-            
-            console.log('✅ Success handling completed');
         } else {
-            console.log('❌ Response is not successful or missing data');
-            console.log('Response success:', response.success);
-            console.log('Response data:', response.data);
             this.showErrorMessage(response.data.message || natal_chart_ajax.strings.error);
         }
     }
@@ -416,15 +312,8 @@ class NatalChartForm {
         this.showErrorMessage(message);
     }
 
-    displayResults(resultsHtml) {
-        console.log('=== DISPLAYING RESULTS ===');
-        console.log('Results HTML length:', resultsHtml.length);
-        console.log('Results HTML preview:', resultsHtml.substring(0, 200));
-        
+        displayResults(resultsHtml) {
         if (this.resultsContainer) {
-            console.log('✅ Results container found:', this.resultsContainer);
-            console.log('Current display style:', this.resultsContainer.style.display);
-            
             this.resultsContainer.innerHTML = `                
                 <div class="natal-chart-results-content">
                     ${resultsHtml}
@@ -432,9 +321,6 @@ class NatalChartForm {
             `;
             
             this.resultsContainer.style.display = 'block';
-            console.log('✅ Results displayed successfully');
-            console.log('New display style:', this.resultsContainer.style.display);
-            console.log('New content length:', this.resultsContainer.innerHTML.length);
             
             // Re-bind close button event
             const closeButton = document.getElementById('natal_chart_close_results');
@@ -442,22 +328,16 @@ class NatalChartForm {
                 closeButton.addEventListener('click', () => this.closeResults());
             }
         } else {
-            console.error('❌ Results container NOT found!');
-            console.log('this.resultsContainer:', this.resultsContainer);
-            
             // Try to find it manually
             const manualResults = document.getElementById('natal_chart-results');
-            console.log('Manual search for natal_chart-results:', manualResults);
             
             if (manualResults) {
-                console.log('✅ Found results container manually, updating it...');
                 manualResults.innerHTML = `                    
                     <div class="natal-chart-results-content">
                         ${resultsHtml}
-                    </div>
+                </div>
                 `;
                 manualResults.style.display = 'block';
-                console.log('✅ Results displayed manually');
             }
         }
     }
@@ -506,26 +386,24 @@ class NatalChartForm {
     }
 
     updateSubmitButton() {
-        console.log('=== Update Submit Button Called ===');
+        
         
         if (this.submitButton) {
-            console.log('Submit button found, checking form validity...');
+            
             const isFormValid = this.isFormValid();
-            console.log('Form validation result:', isFormValid);
+            
             
             // Update button state
             this.submitButton.disabled = !isFormValid;
-            console.log('Submit button disabled state:', this.submitButton.disabled);
+            
             
             // Add visual feedback
             if (isFormValid) {
                 this.submitButton.classList.add('natal-chart-submit-ready');
                 this.submitButton.classList.remove('natal-chart-submit-disabled');
-                console.log('✅ Submit button: ENABLED - All fields are filled');
             } else {
                 this.submitButton.classList.remove('natal-chart-submit-ready');
                 this.submitButton.classList.add('natal-chart-submit-disabled');
-                console.log('❌ Submit button: DISABLED - Some fields are missing');
             }
             
             // Update button text to show current state
@@ -533,20 +411,14 @@ class NatalChartForm {
             if (submitText) {
                 if (isFormValid) {
                     submitText.textContent = 'Generate Report';
-                    console.log('Button text updated to: Generate Report');
                 } else {
                     submitText.textContent = 'Generate Report';
-                    console.log('Button text updated to: Fill All Fields to Generate Report');
                 }
             }
-        } else {
-            console.error('Submit button not found!');
         }
     }
 
     isFormValid() {
-        console.log('=== Form Validation Check ===');
-        
         const requiredFields = [
             'natal_chart_name',
             'natal_chart_birth_date',
@@ -557,45 +429,22 @@ class NatalChartForm {
         
         // Check if location is selected (from location autocomplete)
         const locationField = document.getElementById('natal_chart_location_search');
-        console.log('Location field found:', !!locationField);
-        console.log('Location field element:', locationField);
-        
-        if (locationField) {
-            console.log('Location field classes:', locationField.className);
-            console.log('Has natal-chart-location-selected class:', locationField.classList.contains('natal-chart-location-selected'));
-        }
         
         if (!locationField || !locationField.classList.contains('natal-chart-location-selected')) {
-            console.log('❌ Location validation FAILED');
             return false;
         }
-        
-        console.log('✅ Location validation PASSED');
         
         // Check other required fields
         let allFieldsValid = true;
         requiredFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
-            const fieldExists = !!field;
-            const fieldValue = field ? field.value : 'N/A';
             const fieldTrimmed = field ? field.value.trim() : '';
             const fieldValid = field && fieldTrimmed !== '';
-            
-            console.log(`Field ${fieldId}:`, {
-                exists: fieldExists,
-                value: fieldValue,
-                trimmed: fieldTrimmed,
-                valid: fieldValid
-            });
             
             if (!fieldValid) {
                 allFieldsValid = false;
             }
         });
-        
-        console.log('=== Final Validation Result ===');
-        console.log('All fields valid:', allFieldsValid);
-        console.log('Form is valid:', allFieldsValid);
         
         return allFieldsValid;
     }
@@ -679,9 +528,9 @@ class NatalChartForm {
                 this.bindResultsActionButtons(shortcode);
             });
             
-            console.log(`Updated ${resultsShortcodes.length} results shortcode(s) on the page`);
+
         } else {
-            console.log('No results shortcodes found on the page');
+            
         }
     }
 
@@ -842,7 +691,7 @@ class NatalChartForm {
             // Add visual indication that form is disabled
             form.classList.add('natal-chart-form-disabled');
             
-            console.log('✅ Form with ID "natal_chart_form" and class "natal_chart_form" disabled and hidden successfully');
+            
         } else {
             console.error('❌ Form with ID "natal_chart_form" and class "natal_chart_form" not found!');
         }
@@ -875,7 +724,7 @@ class NatalChartForm {
             // Remove visual indication that form is disabled
             form.classList.remove('natal-chart-form-disabled');
             
-            console.log('✅ Form with ID "natal_chart_form" and class "natal_chart_form" enabled and shown successfully');
+            
         } else {
             console.error('❌ Form with ID "natal_chart_form" and class "natal_chart_form" not found!');
         }
@@ -884,7 +733,7 @@ class NatalChartForm {
 
 // Minimal test function for basic validation logic
 window.minimalFormTest = function() {
-    console.log('=== MINIMAL FORM TEST ===');
+    
     
     // Basic field existence check
     const requiredFields = [
@@ -902,10 +751,10 @@ window.minimalFormTest = function() {
         const field = document.getElementById(fieldId);
         if (field) {
             const hasValue = field.value.trim() !== '';
-            console.log(`✅ ${fieldId}: exists, value: "${field.value}", hasValue: ${hasValue}`);
+            
             if (!hasValue) allFieldsHaveValues = false;
         } else {
-            console.log(`❌ ${fieldId}: NOT FOUND`);
+            
             allFieldsExist = false;
         }
     });
@@ -914,10 +763,10 @@ window.minimalFormTest = function() {
     const locationField = document.getElementById('natal_chart_location_search');
     if (locationField) {
         const hasSelectedClass = locationField.classList.contains('natal-chart-location-selected');
-        console.log(`✅ Location field: exists, hasSelectedClass: ${hasSelectedClass}`);
+        
         
         if (allFieldsExist && allFieldsHaveValues && hasSelectedClass) {
-            console.log('🎉 ALL CONDITIONS MET - Button should be enabled!');
+            
             
             // Manually enable button for testing
             const submitButton = document.getElementById('natal_chart_submit');
@@ -925,69 +774,65 @@ window.minimalFormTest = function() {
                 submitButton.disabled = false;
                 submitButton.classList.add('natal-chart-submit-ready');
                 submitButton.classList.remove('natal-chart-submit-disabled');
-                console.log('✅ Button manually enabled for testing');
+                
             }
         } else {
-            console.log('❌ Some conditions not met:');
-            console.log('  - All fields exist:', allFieldsExist);
-            console.log('  - All fields have values:', allFieldsHaveValues);
-            console.log('  - Location selected:', hasSelectedClass);
+            
+            
+            
+            
         }
     } else {
-        console.log('❌ Location field: NOT FOUND');
+        
     }
 };
 
 // Simple test function for console debugging
 window.simpleFormTest = function() {
-    console.log('=== SIMPLE FORM TEST ===');
+    
     
     // Check if form exists
     const form = document.getElementById('natal_chart_form');
-    console.log('Form exists:', !!form);
+    
     
     // Check if submit button exists
     const submitButton = document.getElementById('natal_chart_submit');
-    console.log('Submit button exists:', !!submitButton);
+    
     
     // Check if NatalChartForm is initialized
-    console.log('NatalChartForm exists:', !!window.natalChartForm);
+    
     
     // Check each field
     const fields = ['natal_chart_name', 'natal_chart_birth_date', 'natal_chart_birth_hour', 'natal_chart_birth_minute', 'natal_chart_birth_ampm'];
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
-            console.log(`${fieldId}: "${field.value}" (valid: ${field.value.trim() !== ''})`);
+
         } else {
-            console.log(`${fieldId}: NOT FOUND`);
+            
         }
     });
     
     // Check location field
     const locationField = document.getElementById('natal_chart_location_search');
     if (locationField) {
-        console.log('Location field:', {
-            value: locationField.value,
-            hasSelectedClass: locationField.classList.contains('natal-chart-location-selected'),
-            classes: locationField.className
-        });
+
     } else {
-        console.log('Location field: NOT FOUND');
+        
     }
     
     // Test validation manually
     if (window.natalChartForm && window.natalChartForm.isFormValid) {
         const isValid = window.natalChartForm.isFormValid();
-        console.log('Manual validation result:', isValid);
+        
     } else {
-        console.log('Cannot run validation - method not available');
+        
     }
 };
 
 // Global function to enable form and refresh page
 window.enableFormAndRefresh = function() {
-    console.log('=== ENABLING FORM AND REFRESHING PAGE ===');
+    
     
     // Re-enable and show the form if it exists
     if (window.natalChartForm) {
@@ -1002,7 +847,7 @@ window.enableFormAndRefresh = function() {
 
 // Global function to manually initialize the form (can be called from shortcode)
 window.initializeNatalChartFormManually = function() {
-    console.log('Manual initialization requested...');
+    
     return initializeNatalChartForm();
 };
 
@@ -1023,7 +868,7 @@ window.getNatalChartFormStatus = function() {
 
 // Simple test function for form submission
 window.testFormSubmission = function() {
-    console.log('=== TESTING FORM SUBMISSION ===');
+    
     
     // Check if form handler is available
     if (!window.natalChartForm) {
@@ -1035,25 +880,25 @@ window.testFormSubmission = function() {
     if (typeof window.enableSubmitButton === 'function') {
         const isValid = window.enableSubmitButton();
         if (!isValid) {
-            console.log('❌ Form is not valid, cannot test submission');
+            
             return false;
         }
-        console.log('✅ Form is valid, testing submission...');
+        
     }
     
     // Check if submit button is enabled
     const submitButton = document.getElementById('natal_chart_submit');
     if (submitButton && submitButton.disabled) {
-        console.log('❌ Submit button is disabled, cannot test submission');
+        
         return false;
     }
     
-    console.log('✅ Submit button is enabled, proceeding with test...');
+    
     
     // Trigger form submission
     try {
         window.natalChartForm.handleSubmit(new Event('submit'));
-        console.log('✅ Form submission test triggered successfully');
+        
         return true;
     } catch (error) {
         console.error('❌ Form submission test failed:', error);
@@ -1063,16 +908,16 @@ window.testFormSubmission = function() {
 
 // Test AJAX request directly
 window.testAjaxRequest = function() {
-    console.log('=== TESTING AJAX REQUEST DIRECTLY ===');
+    
     
     // Check if AJAX URL is available
     if (!window.natal_chart_ajax || !window.natal_chart_ajax.ajax_url) {
         console.error('❌ AJAX URL not available!');
-        console.log('natal_chart_ajax:', window.natal_chart_ajax);
+        
         return false;
     }
     
-    console.log('✅ AJAX URL available:', window.natal_chart_ajax.ajax_url);
+    
     
     // Test with simple data
     const testData = {
@@ -1088,7 +933,7 @@ window.testAjaxRequest = function() {
         nonce: 'test_nonce'
     };
     
-    console.log('Test data:', testData);
+    
     
     // Make the request
     fetch(window.natal_chart_ajax.ajax_url, {
@@ -1099,12 +944,12 @@ window.testAjaxRequest = function() {
         body: new URLSearchParams(testData)
     })
     .then(response => {
-        console.log('✅ AJAX request sent successfully!');
-        console.log('Response status:', response.status);
+        
+        
         return response.text();
     })
     .then(data => {
-        console.log('Response data:', data);
+        
     })
     .catch(error => {
         console.error('❌ AJAX request failed:', error);
@@ -1115,7 +960,7 @@ window.testAjaxRequest = function() {
 
 // Test form data collection
 window.testFormDataCollection = function() {
-    console.log('=== TESTING FORM DATA COLLECTION ===');
+    
     
     if (!window.natalChartForm) {
         console.error('❌ NatalChartForm not available!');
@@ -1124,7 +969,7 @@ window.testFormDataCollection = function() {
     
     try {
         const formData = window.natalChartForm.getFormData();
-        console.log('✅ Form data collected successfully:', formData);
+        
         return formData;
     } catch (error) {
         console.error('❌ Form data collection failed:', error);
@@ -1134,7 +979,7 @@ window.testFormDataCollection = function() {
 
 // Simple function to enable submit button when all fields are filled
 window.enableSubmitButton = function() {
-    console.log('=== ENABLING SUBMIT BUTTON ===');
+    
     
     // Get the submit button
     const submitButton = document.getElementById('natal_chart_submit');
@@ -1157,9 +1002,9 @@ window.enableSubmitButton = function() {
     requiredFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field && field.value.trim() !== '') {
-            console.log(`✅ ${fieldId}: "${field.value}"`);
+            
         } else {
-            console.log(`❌ ${fieldId}: empty or not found`);
+            
             allFieldsFilled = false;
         }
     });
@@ -1167,9 +1012,9 @@ window.enableSubmitButton = function() {
     // Check if location is selected
     const locationField = document.getElementById('natal_chart_location_search');
     if (locationField && locationField.classList.contains('natal-chart-location-selected')) {
-        console.log('✅ Location: selected');
+        
     } else {
-        console.log('❌ Location: not selected');
+        
         allFieldsFilled = false;
     }
     
@@ -1178,20 +1023,20 @@ window.enableSubmitButton = function() {
         submitButton.disabled = false;
         submitButton.classList.add('natal-chart-submit-ready');
         submitButton.classList.remove('natal-chart-submit-disabled');
-        console.log('🎉 SUBMIT BUTTON ENABLED - All fields are filled!');
+        
         return true;
     } else {
         submitButton.disabled = true;
         submitButton.classList.remove('natal-chart-submit-ready');
         submitButton.classList.add('natal-chart-submit-disabled');
-        console.log('❌ Submit button disabled - Some fields are missing');
+        
         return false;
     }
 };
 
 // Auto-check button state every time a field changes
 function setupAutoButtonCheck() {
-    console.log('Setting up auto button check...');
+    
     
     // Get all form fields
     const allFields = [
@@ -1207,7 +1052,7 @@ function setupAutoButtonCheck() {
     allFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
-            console.log(`Adding auto-check to field: ${fieldId}`);
+            
             
             // For input fields
             if (field.tagName === 'INPUT' || field.tagName === 'SELECT') {
@@ -1232,42 +1077,31 @@ function setupAutoButtonCheck() {
     // Initial check
     setTimeout(enableSubmitButton, 100);
     
-    console.log('Auto button check setup complete');
+    
 }
 
 // Comprehensive status check function
 window.checkFormStatus = function() {
-    console.log('=== COMPREHENSIVE FORM STATUS CHECK ===');
+    
     
     // Check document state
-    console.log('Document readyState:', document.readyState);
-    console.log('Document URL:', window.location.href);
+    
+    
     
     // Check for form elements
     const allForms = document.querySelectorAll('form');
-    console.log('Total forms on page:', allForms.length);
+    
     
     allForms.forEach((form, index) => {
-        console.log(`Form ${index + 1}:`, {
-            id: form.id,
-            className: form.className,
-            action: form.action,
-            method: form.method
-        });
+
     });
     
     // Check for our specific form
     const natalChartForm = document.getElementById('natal_chart_form');
-    console.log('Natal chart form found:', !!natalChartForm);
+    
     
     if (natalChartForm) {
-        console.log('Natal chart form details:', {
-            id: natalChartForm.id,
-            className: natalChartForm.className,
-            action: natalChartForm.action,
-            method: natalChartForm.method,
-            children: natalChartForm.children.length
-        });
+
         
         // Check for key form elements
         const keyElements = [
@@ -1282,158 +1116,113 @@ window.checkFormStatus = function() {
         
         keyElements.forEach(elementId => {
             const element = document.getElementById(elementId);
-            console.log(`${elementId}:`, {
-                exists: !!element,
-                type: element ? element.type : 'N/A',
-                value: element ? element.value : 'N/A'
-            });
+
         });
     }
     
     // Check JavaScript objects
-    console.log('Window objects:', {
-        natalChartForm: !!window.natalChartForm,
-        natalChartLocationAutocomplete: !!window.natalChartLocationAutocomplete
-    });
+    
     
     // Check if scripts are loaded
     const scripts = document.querySelectorAll('script[src*="natal-chart"]');
-    console.log('Natal chart scripts loaded:', scripts.length);
+    
     scripts.forEach((script, index) => {
-        console.log(`Script ${index + 1}:`, script.src);
+        
     });
     
     // Check for shortcode content
     const shortcodeContent = document.querySelectorAll('[class*="natal-chart"]');
-    console.log('Natal chart CSS classes found:', shortcodeContent.length);
+    
     
     // Try to initialize if not already done
     if (!window.natalChartForm) {
-        console.log('Attempting to initialize NatalChartForm...');
+        
         try {
             initializeNatalChartForm();
-            console.log('Initialization attempt completed');
+            
         } catch (error) {
             console.error('Initialization error:', error);
         }
     }
     
-    console.log('=== STATUS CHECK COMPLETE ===');
+    
 };
 
 // Robust initialization that waits for the form to appear
 function initializeNatalChartForm() {
-    console.log('Checking for natal chart form...');
+    
     
     const form = document.getElementById('natal_chart_form');
     if (form) {
-        console.log('Form found! Initializing NatalChartForm...');
+        
         if (!window.natalChartForm) {
             try {
                 window.natalChartForm = new NatalChartForm();
-                console.log('NatalChartForm initialized successfully');
+                
                 return true;
             } catch (error) {
                 console.error('Error initializing NatalChartForm:', error);
                 return false;
             }
         } else {
-            console.log('NatalChartForm already exists');
+            
             return true;
         }
     } else {
-        console.log('Form not found yet, will retry...');
+        
         return false;
     }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded - Starting form detection...');
-    console.log('Current document readyState:', document.readyState);
-    console.log('Current form elements on page:', document.querySelectorAll('form').length);
-    console.log('Form with ID natal_chart_form exists:', !!document.getElementById('natal_chart_form'));
     
     // Set up the simple button enable system
-    console.log('Setting up simple button enable system...');
+    
     setupAutoButtonCheck();
     
     // Try to initialize immediately
     if (!initializeNatalChartForm()) {
         // If form not found, start polling
-        console.log('Starting form detection polling...');
+        
         const formCheckInterval = setInterval(() => {
-            console.log('Polling for form... Current form elements:', document.querySelectorAll('form').length);
-            console.log('Form with ID natal_chart_form exists:', !!document.getElementById('natal_chart_form'));
-            
             if (initializeNatalChartForm()) {
                 clearInterval(formCheckInterval);
-                console.log('Form detected and initialized, stopping polling');
             }
         }, 500); // Check every 500ms
         
         // Stop polling after 10 seconds to prevent infinite checking
         setTimeout(() => {
             clearInterval(formCheckInterval);
-            console.log('Form detection timeout - form may not be present on this page');
-            console.log('Final check - Form elements on page:', document.querySelectorAll('form').length);
-            console.log('Final check - Form with ID natal_chart_form exists:', !!document.getElementById('natal_chart_form'));
         }, 10000);
     }
 });
 
 // Also try to initialize if DOM is already loaded
 if (document.readyState === 'loading') {
-    console.log('DOM still loading, waiting for DOMContentLoaded...');
+    
 } else {
-    console.log('DOM already loaded, checking for form immediately...');
-    console.log('Current form elements on page:', document.querySelectorAll('form').length);
-    console.log('Form with ID natal_chart_form exists:', !!document.getElementById('natal_chart_form'));
     initializeNatalChartForm();
 }
 
 // More aggressive initialization - check every second for the first 30 seconds
 setTimeout(() => {
-    console.log('=== AGGRESSIVE INITIALIZATION CHECK ===');
-    console.log('Checking for form after 1 second delay...');
-    console.log('Form elements on page:', document.querySelectorAll('form').length);
-    console.log('Form with ID natal_chart_form exists:', !!document.getElementById('natal_chart_form'));
-    
     if (!window.natalChartForm) {
-        console.log('NatalChartForm not initialized, attempting initialization...');
         initializeNatalChartForm();
-    } else {
-        console.log('NatalChartForm already initialized');
     }
 }, 1000);
 
 // Check again after 5 seconds
 setTimeout(() => {
-    console.log('=== 5 SECOND INITIALIZATION CHECK ===');
-    console.log('Checking for form after 5 second delay...');
-    console.log('Form elements on page:', document.querySelectorAll('form').length);
-    console.log('Form with ID natal_chart_form exists:', !!document.getElementById('natal_chart_form'));
-    
     if (!window.natalChartForm) {
-        console.log('NatalChartForm not initialized, attempting initialization...');
         initializeNatalChartForm();
-    } else {
-        console.log('NatalChartForm already initialized');
     }
 }, 5000);
 
 // Check again after 10 seconds
 setTimeout(() => {
-    console.log('=== 10 SECOND INITIALIZATION CHECK ===');
-    console.log('Checking for form after 10 second delay...');
-    console.log('Form elements on page:', document.querySelectorAll('form').length);
-    console.log('Form with ID natal_chart_form exists:', !!document.getElementById('natal_chart_form'));
-    
     if (!window.natalChartForm) {
-        console.log('NatalChartForm not initialized, attempting initialization...');
         initializeNatalChartForm();
-    } else {
-        console.log('NatalChartForm already initialized');
     }
 }, 10000);
 
@@ -1446,7 +1235,7 @@ if (typeof MutationObserver !== 'undefined') {
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         // Check if the added node contains our form
                         if (node.id === 'natal_chart_form' || node.querySelector('#natal_chart_form')) {
-                            console.log('Form detected via MutationObserver');
+                            
                             setTimeout(initializeNatalChartForm, 100);
                         }
                     }
@@ -1461,59 +1250,56 @@ if (typeof MutationObserver !== 'undefined') {
         subtree: true
     });
     
-    console.log('MutationObserver started for dynamic form detection');
+    
 }
 
 // Test function to check results shortcode state
 window.checkResultsShortcodeState = function() {
-    console.log('=== CHECKING RESULTS SHORTCODE STATE ===');
+    
     
     // Check if results shortcodes exist on the page
     const resultsShortcodes = document.querySelectorAll('.natal-chart-results-shortcode');
-    console.log(`Found ${resultsShortcodes.length} results shortcode(s) on the page`);
     
     // Check if form has results displayed
     const formResults = document.getElementById('natal-chart-results');
     if (formResults) {
-        console.log('Form results container found');
-        console.log('Display style:', formResults.style.display);
-        console.log('Has content:', formResults.innerHTML.length > 0);
+        
+        
+        
     } else {
-        console.log('Form results container NOT found');
+        
     }
     
     resultsShortcodes.forEach((shortcode, index) => {
-        console.log(`\n--- Results Shortcode ${index + 1} ---`);
-        console.log('Element:', shortcode);
-        console.log('Display style:', shortcode.style.display);
-        console.log('Visibility:', shortcode.style.visibility);
+        
+        
+        
+        
         
         // Check content
         const contentContainer = shortcode.querySelector('.natal-chart-results-content');
         if (contentContainer) {
-            console.log('Content container found');
-            console.log('Content HTML length:', contentContainer.innerHTML.length);
-            console.log('Content preview:', contentContainer.innerHTML.substring(0, 200));
+            
         } else {
-            console.log('Content container NOT found');
+            
         }
         
         // Check if it has the "no results" message
         const noResults = shortcode.querySelector('.natal-chart-no-results');
         if (noResults) {
-            console.log('Has "no results" message');
+            
         } else {
-            console.log('No "no results" message');
+            
         }
     });
     
     // Check if there are any results displayed in the form
-    console.log('\n--- Checking Form Results ---');
+    
     if (formResults && formResults.style.display !== 'none') {
-        console.log('✅ Form has results displayed');
-        console.log('Results content length:', formResults.innerHTML.length);
+        
+        
     } else {
-        console.log('❌ Form has no results displayed');
+        
     }
     
     return resultsShortcodes.length;
@@ -1521,7 +1307,7 @@ window.checkResultsShortcodeState = function() {
 
 // Test function to manually update results shortcodes
 window.manuallyUpdateResultsShortcodes = function(resultsHtml) {
-    console.log('=== MANUALLY UPDATING RESULTS SHORTCODES ===');
+    
     
     if (!window.natalChartForm) {
         console.error('❌ NatalChartForm not available!');
@@ -1530,7 +1316,7 @@ window.manuallyUpdateResultsShortcodes = function(resultsHtml) {
     
     try {
         window.natalChartForm.updateResultsShortcodes(resultsHtml);
-        console.log('✅ Results shortcodes updated manually');
+        
         return true;
     } catch (error) {
         console.error('❌ Manual update failed:', error);
@@ -1539,7 +1325,7 @@ window.manuallyUpdateResultsShortcodes = function(resultsHtml) {
 
 // Simple test function to check form state
 window.checkFormState = function() {
-    console.log('=== CHECKING FORM STATE ===');
+    
     
     // Check if form handler exists
     if (!window.natalChartForm) {
@@ -1547,24 +1333,19 @@ window.checkFormState = function() {
         return false;
     }
     
-    console.log('✅ NatalChartForm available');
-    console.log('Form element:', window.natalChartForm.form);
-    console.log('Submit button:', window.natalChartForm.submitButton);
-    console.log('Results container:', window.natalChartForm.resultsContainer);
+    
+    
+    
+    
     
     // Check if results container exists in DOM
     const resultsContainer = document.getElementById('natal_chart-results');
-    console.log('Results container in DOM:', resultsContainer);
+       
     
-    if (resultsContainer) {
-        console.log('Results container display:', resultsContainer.style.display);
-        console.log('Results container content length:', resultsContainer.innerHTML.length);
-        console.log('Results container HTML:', resultsContainer.innerHTML.substring(0, 200));
-    }
     
     // Check if form exists in DOM
     const form = document.getElementById('natal_chart_form');
-    console.log('Form in DOM:', form);
+    
     
     return true;
 };
@@ -1648,3 +1429,4 @@ if (typeof window.initializeNatalChartFormManually === 'function') {
         setTimeout(initializeToggleableSections, 100);
     };
 }
+
