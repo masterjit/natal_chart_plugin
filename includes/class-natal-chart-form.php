@@ -492,6 +492,11 @@ class Natal_Chart_Form {
             $html .= $this->format_planets_interpretations_section($data['interpretations']['planets']);
         }
         
+        // Houses Section (Detailed Interpretations)
+        if (isset($data['interpretations']['houses']) && is_array($data['interpretations']['houses'])) {
+            $html .= $this->format_houses_interpretations_section($data['interpretations']['houses']);
+        }
+        
         // Additional astrological data
         if (isset($data['angles'])) {
             $html .= $this->format_angles_section($data['angles']);
@@ -827,6 +832,102 @@ class Natal_Chart_Form {
     }
 
     /**
+     * Format houses interpretations section
+     * 
+     * @param array $houses_interpretations Houses interpretations data
+     * @return string Formatted HTML
+     */
+    private function format_houses_interpretations_section($houses_interpretations) {
+        if (empty($houses_interpretations) || !is_array($houses_interpretations)) {
+            return '';
+        }
+
+        $html = '<div class="natal-chart-section natal-chart-houses-interpretations">';
+        $html .= '<div class="natal-chart-section-toggle collapsed" onclick="toggleSection(this)">';
+        $html .= '<span>' . __('HOUSE INTERPRETATIONS', 'natal-chart-plugin') . '</span>';
+        $html .= '</div>';
+        
+        $html .= '<div class="natal-chart-section-content" style="display: none;">';
+        
+        // Header description
+        if (!empty($houses_interpretations['header'])) {
+            $html .= '<div class="natal-chart-section-description">';
+            $html .= wp_kses_post(nl2br($houses_interpretations['header']));
+            $html .= '</div>';
+        }
+        
+        $html .= '<div class="natal-chart-houses-interpretations-list">';
+        
+        foreach ($houses_interpretations as $house_key => $house_data) {
+            // Skip if it's not a house or doesn't have planet data
+            if ($house_key === 'header' || !is_array($house_data)) {
+                continue;
+            }
+            
+            // Extract house number from key (e.g., "house_4" -> "4th House")
+            $house_number = str_replace('house_', '', $house_key);
+            $house_label = $this->get_house_label($house_number);
+            
+            $html .= '<div class="natal-chart-house-interpretation-item">';
+            
+            // Header section with House Number
+            $html .= '<div class="natal-chart-house-interpretation-header">';
+            $html .= '<span class="natal-chart-house-number">' . esc_html($house_label) . '</span>';
+            $html .= '</div>';
+            
+            // Content section with Planet Interpretations
+            $html .= '<div class="natal-chart-house-interpretation-content">';
+            
+            foreach ($house_data as $planet_data) {
+                $planet_name = $planet_data['planet'] ?? '';
+                $interpretation = $planet_data['interpretation'] ?? '';
+                
+                if (!empty($planet_name) && !empty($interpretation)) {
+                    $html .= '<div class="natal-chart-house-planet-item">';
+                    $html .= '<div class="natal-chart-house-planet-header">';
+                    $html .= '<span class="natal-chart-planet-symbol">' . $this->get_planet_symbol($planet_name) . '</span>';
+                    $html .= '<span class="natal-chart-planet-name">' . esc_html($planet_name) . '</span>';
+                    $html .= '</div>';
+                    
+                    // Interpretation with continuation logic
+                    $initial_length = 300;
+                    $initial_content = substr($interpretation, 0, $initial_length);
+                    $remaining_content = substr($interpretation, $initial_length);
+                    
+                    $html .= '<div class="natal-chart-interpretation">';
+                    $html .= wp_kses_post($initial_content);
+                    
+                    // If there's remaining content, add it in a hidden div
+                    if (!empty($remaining_content)) {
+                        $html .= '<span class="natal-chart-triple-dots">...</span>';
+                        $html .= '<span class="natal-chart-interpretation-remaining" style="display: none;">';
+                        $html .= wp_kses_post($remaining_content);
+                        $html .= '</span>';
+                        
+                        $html .= '<div class="natal-chart-interpretation-toggle">';
+                        $html .= '<button type="button" class="natal-chart-show-more" onclick="toggleInterpretation(this)">';
+                        $html .= __('Show More', 'natal-chart-plugin');
+                        $html .= '</button>';
+                        $html .= '</div>';
+                    }
+                    
+                    $html .= '</div>';
+                    $html .= '</div>';
+                }
+            }
+            
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+        
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
+        return $html;
+    }
+
+    /**
      * Format angles section
      * 
      * @param array $angles Angles data
@@ -1010,6 +1111,30 @@ class Natal_Chart_Form {
         ];
         
         return isset($names[$house_number]) ? $names[$house_number] : $house_number;
+    }
+
+    /**
+     * Get house label (e.g., "1st House" -> "1st House")
+     * 
+     * @param string $house_number House number
+     * @return string House label
+     */
+    private function get_house_label($house_number) {
+        $labels = [
+            '1' => __('1st House', 'natal-chart-plugin'),
+            '2' => __('2nd House', 'natal-chart-plugin'),
+            '3' => __('3rd House', 'natal-chart-plugin'),
+            '4' => __('4th House', 'natal-chart-plugin'),
+            '5' => __('5th House', 'natal-chart-plugin'),
+            '6' => __('6th House', 'natal-chart-plugin'),
+            '7' => __('7th House', 'natal-chart-plugin'),
+            '8' => __('8th House', 'natal-chart-plugin'),
+            '9' => __('9th House', 'natal-chart-plugin'),
+            '10' => __('10th House', 'natal-chart-plugin'),
+            '11' => __('11th House', 'natal-chart-plugin'),
+            '12' => __('12th House', 'natal-chart-plugin')
+        ];
+        return isset($labels[$house_number]) ? $labels[$house_number] : $house_number;
     }
 
     /**

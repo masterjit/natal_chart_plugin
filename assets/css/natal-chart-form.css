@@ -441,18 +441,7 @@
     margin-bottom: 12px;
 }
 
-.natal-chart-house-number {
-    background: #28a745;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 14px;
-}
+
 
 .natal-chart-house-name {
     color: #155724;
@@ -1712,16 +1701,7 @@
     min-width: 40px;
 }
 
-.natal-chart-house-number {
-    background: #28a745;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 600;
-    min-width: 20px;
-    text-align: center;
-}
+
 
 .natal-chart-planet-retrograde {
     background: #e74c3c;
@@ -2092,4 +2072,74 @@
 .natal-chart-section-toggle:not(.collapsed)::after {
     content: '−';
     color: white;
+}
+
+/* Houses Interpretations Section */
+.natal-chart-houses-interpretations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.natal-chart-house-interpretation-item {
+    background: #ffffff;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.natal-chart-house-interpretation-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.natal-chart-house-interpretation-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.natal-chart-house-number {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    line-height: 1.2;
+    display: block;
+}
+
+.natal-chart-house-interpretation-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.natal-chart-house-planet-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    border-left: 4px solid #3498db;
+}
+
+.natal-chart-house-planet-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.natal-chart-planet-symbol {
+    font-size: 1.3em;
+    color: #2c3e50;
+}
+
+.natal-chart-planet-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #2c3e50;
+    text-transform: capitalize;
 }
